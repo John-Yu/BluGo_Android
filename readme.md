@@ -1,8 +1,8 @@
  # Introduction
-         BluGo is free open-source Android GO board game program.  
-         It supports 1:1 game with another human player using bluetooth.
-         This project forked from [chykrkr/BluGo_Android](https://github.com/chykrkr/BluGo_Android),  thank chykrkr.
-         You can download it's source from  [GITHUB](https://github.com/John-Yu/BluGo_Android) 
+   BluGo is free open-source Android GO board game program.  
+   It supports 1:1 game with another human player using bluetooth.   
+   This project forked from [chykrkr's BluGo_Android](https://github.com/chykrkr/BluGo_Android),  thank chykrkr.   
+   You can download it's source from  [GITHUB](https://github.com/John-Yu/BluGo_Android) 
  
  # Todo
 
@@ -12,10 +12,11 @@
 - [ ] GPU support
                   
  # License
- 	The code is released under the BSD license. 
- 	Any comments or recommendations are welcomed. 
-      Original Copyright (c) 2016 chykrkr@gmail.com.        All rights reserved.            
-      Redistribution and use in source and binary forms, with or without  modification, are permitted provided that the following conditions are met:
+ The code is released under the BSD license.    
+ Any comments or recommendations are welcomed.    
+ Original Copyright (c) 2016 chykrkr@gmail.com.        
+ All rights reserved.             
+ Redistribution and use in source and binary forms, with or without  modification, are permitted provided that the following conditions are met:
           * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.          	
           * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.          	
           * Neither the name of the BluGo nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.            
