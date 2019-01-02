@@ -1,9 +1,9 @@
 package com.example.user.blugo;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
@@ -22,15 +22,18 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import static java.lang.Math.round;
+
 /**
  * TODO: document your custom view class.
  */
 public class GoBoardView extends View implements GoControl.Callback {
     private Drawable mExampleDrawable;
+    private Paint paint = null;
 
     private final static int OPAQUE_ALPHA = 255;
     private final static int GHOST_ALPHA = 150;
-
+    private final static String alphabet = "ABCDEFGHJKLMNOPQRST";
     private MediaPlayer mplayer;
 
     private Point ghost_pos = new Point(-1, -1);
@@ -38,6 +41,7 @@ public class GoBoardView extends View implements GoControl.Callback {
     private int board_canvas_x = -1, board_canvas_y = -1;
     private int board_canvas_w = -1, board_canvas_h = -1;
     private int board_square_size = -1;
+    private int board_size = 0;
 
     private GoControl go_control = null;
 
@@ -151,35 +155,18 @@ public class GoBoardView extends View implements GoControl.Callback {
         }
 
         //Log.d("TOUCHEVT", event.toString());
-
+        p = getGhost_pos(event.getX(), event.getY());
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
-                p = getGhost_pos(event.getX(), event.getY());
-
-                /* calc_mode : just update guide pos */
-                if (go_control.calc_mode()) {
-                    if (!ghost_pos.equals(p)) {
-                        ghost_pos.x = p.x;
-                        ghost_pos.y = p.y;
-                        this.invalidate();
-                    }
-                    break;
-                }
-
                 if (!ghost_pos.equals(p)) {
                     ghost_pos.x = p.x;
                     ghost_pos.y = p.y;
                     this.invalidate();
-                } else {
-                    /* If putStoneAt is successful then this view is updated automatically */
-                    go_control.putStoneAt(p.x, p.y, false);
                 }
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                p = getGhost_pos(event.getX(), event.getY());
-
                 if (!ghost_pos.equals(p)) {
                     ghost_pos.x = p.x;
                     ghost_pos.y = p.y;
@@ -188,8 +175,8 @@ public class GoBoardView extends View implements GoControl.Callback {
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (go_control.calc_mode()) {
-                    p = getGhost_pos(event.getX(), event.getY());
+                if (!p.equals(-1,-1)) {
+                    /* If putStoneAt is successful then this view is updated automatically */
                     go_control.putStoneAt(p.x, p.y, false);
                 }
                 break;
@@ -216,6 +203,10 @@ public class GoBoardView extends View implements GoControl.Callback {
     }
 
     private void invalidateTextPaintAndMeasurements() {
+        paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
     }
 
     @Override
@@ -223,6 +214,7 @@ public class GoBoardView extends View implements GoControl.Callback {
         ShapeDrawable boardline, flower_point, rect;
         Path path;
         super.onDraw(canvas);
+        //canvas.drawText();
 
         // TODO: consider storing these as member variables to reduce
         // allocations per draw cycle.
@@ -258,7 +250,14 @@ public class GoBoardView extends View implements GoControl.Callback {
         if (go_control == null)
             return;
 
-        int board_size = go_control.getBoardSize();
+        board_size = go_control.getBoardSize();
+
+        board_square_size = board_canvas_w / (board_size+1);
+        drawCoordinates(canvas);
+        board_canvas_h -= board_square_size;
+        board_canvas_w -= board_square_size;
+        board_canvas_x += board_square_size;
+        board_canvas_y += board_square_size;
 
         /*
         START_POS_X = (int)(CAN_W - BL_STROKE_SIZE * 19 +  (int) (CAN_W / 19) * 18)/2
@@ -282,6 +281,7 @@ public class GoBoardView extends View implements GoControl.Callback {
         path.addRect(start_p, start_p, end_p, end_p, Path.Direction.CW);
 
         /* draw GoBoard lines */
+        //TODO: shoud avoid objects allocations during drawing/layout opeations
         boardline = new ShapeDrawable(new PathShape(path, board_canvas_w, board_canvas_h));
         boardline.getPaint().setColor(0xff000000);
         boardline.getPaint().setStrokeWidth(3);
@@ -510,6 +510,24 @@ public class GoBoardView extends View implements GoControl.Callback {
         tmpy = board_canvas_y + start_p + board_square_size * j;
         s.setBounds(tmpx - tmpw, tmpy - tmph, tmpx + tmpw, tmpy + tmph);
         s.draw(canvas);
+    }
+
+    private void drawCoordinates(Canvas canvas){
+        paint.setTextSize(round(board_square_size * 0.628));
+        float x = board_canvas_x + board_square_size * (float)1.25;
+        float y = board_canvas_y + board_square_size;
+        for (int i = 0; i < board_size; i++) {
+            canvas.drawText(alphabet,i,i+1,x,y,paint);
+            x += board_square_size;
+        }
+        x = board_canvas_x + board_square_size * (float)0.3;
+        y = board_canvas_y + board_square_size * board_size + board_square_size * (float)0.75;
+        for (int i = 1; i <= board_size; i++) {
+            String tmp = i + "   ";
+            if(i<10) tmp = " " + tmp;
+            canvas.drawText(tmp,0,2,x,y,paint);
+            y -= board_square_size;
+        }
     }
 
     private void draw_reddot(Canvas canvas, ShapeDrawable s, int i, int j)

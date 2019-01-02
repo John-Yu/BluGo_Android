@@ -122,7 +122,7 @@ public class GoControlSingle extends GoControl {
 
         pass_count = 0;
 
-	current_turn = next_turn;
+	    current_turn = next_turn;
 
         if (callback_receiver != null) {
             callback_receiver.put_stone_success();

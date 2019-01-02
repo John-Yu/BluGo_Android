@@ -4,6 +4,12 @@
    This project forked from [chykrkr's BluGo_Android](https://github.com/chykrkr/BluGo_Android),  thank chykrkr.   
    You can download source code from  [GITHUB](https://github.com/John-Yu/BluGo_Android) 
  
+ # How to Place stone
+ The way of place stone is almost like the habit of human beings. Touch-Move-Up
+ - Touch: A large cross cursor will appear to conveniently indicate the coordinates of the touch point
+ - Move: When you move your finger, the cursor follow it
+ - Up: When you raise your finger, the stone will put at cursor point
+ 
  # Todo
 
 - [ ] Upgrade the build environment, to support more modern mobile phones
@@ -24,6 +30,8 @@ https://github.com/xianyi/OpenBLAS
 https://github.com/dec1/Boost-for-Android
 * Newer Alpha Zero (Go, Chess, Shogi) paper:
 https://arxiv.org/pdf/1712.01815.pdf
+* GOdroid is an Android application to play the board game Go：
+https://sourceforge.net/projects/godroid/
                   
  # License
  The code is released under the BSD license.    
