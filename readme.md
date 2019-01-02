@@ -1,15 +1,29 @@
  # Introduction
-   BluGo is free open-source Android GO board game program.  
+   BluGo is a free open-source Android GO board game program.  
    It supports 1:1 game with another human player using bluetooth.   
    This project forked from [chykrkr's BluGo_Android](https://github.com/chykrkr/BluGo_Android),  thank chykrkr.   
-   You can download it's source from  [GITHUB](https://github.com/John-Yu/BluGo_Android) 
+   You can download source code from  [GITHUB](https://github.com/John-Yu/BluGo_Android) 
  
  # Todo
 
 - [ ] Upgrade the build environment, to support more modern mobile phones
 - [ ] Improve human-computer interaction and enhance user experience
-- [ ] Support man-machine game and introduce a modern GO AI
+- [ ] Support man-machine game and introduce a modern GO AI (AI inside)
 - [ ] GPU support
+
+# Related links
+
+* Leela Zero is a Go program reimplementation of the system described
+in the AlphaGoZero paper:
+https://github.com/gcp/leela-zero
+* GUI and study tool for Leela Zero:
+https://github.com/CamWagner/lizzie
+* OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD version:
+https://github.com/xianyi/OpenBLAS
+* Android port of Boost C++ Libraries:
+https://github.com/dec1/Boost-for-Android
+* Newer Alpha Zero (Go, Chess, Shogi) paper:
+https://arxiv.org/pdf/1712.01815.pdf
                   
  # License
  The code is released under the BSD license.    

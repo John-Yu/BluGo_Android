@@ -58,7 +58,7 @@ public class FileChooser {
 		}
 	    });
 	dialog.setContentView(list);
-	dialog.getWindow().setLayout(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+		dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 	refresh(Environment.getExternalStorageDirectory());
     }
 
@@ -110,7 +110,7 @@ public class FileChooser {
 
 	    // refresh the user interface
 	    dialog.setTitle(currentPath.getPath());
-	    list.setAdapter(new ArrayAdapter(activity,
+		list.setAdapter(new ArrayAdapter<String>(activity,
 					     android.R.layout.simple_list_item_1, fileList) {
 		    @Override public View getView(int pos, View view, ViewGroup parent) {
 			view = super.getView(pos, view, parent);

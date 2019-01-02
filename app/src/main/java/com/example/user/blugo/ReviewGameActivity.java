@@ -1,7 +1,7 @@
 package com.example.user.blugo;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
+import android.widget.ProgressBar;
 import android.content.Intent;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +35,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
 
     private Button button, btn_detail;
 
-    private ProgressDialog load_progress = null;
+    private ProgressBar load_progress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +92,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
 
             switch (msg.what) {
                 case GoMessageListener.MSG_LOAD_END:
-                    load_progress = (ProgressDialog) msg.obj;
+                    load_progress = (ProgressBar) msg.obj;
 
                     sbar.setMax(game.get_last_pos());
                     sbar.setProgress(game.getCur_pos());
@@ -124,7 +124,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
                         load_sgf();
                         need_to_load = !need_to_load;
                     } else if (load_progress != null) {
-                        load_progress.dismiss();
+                        load_progress.setVisibility(View.GONE);     // To Hide ProgressBar
                         load_progress = null;
                     }
                     return true;

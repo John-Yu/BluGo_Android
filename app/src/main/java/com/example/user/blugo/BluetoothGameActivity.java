@@ -88,7 +88,11 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         return str;
     }
 
-    private BlutoothCommThread comm_thread = null;
+    private BlutoothCommThread comm_thread;
+
+    {
+        comm_thread = null;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

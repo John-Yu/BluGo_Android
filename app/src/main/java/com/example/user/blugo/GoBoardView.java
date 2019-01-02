@@ -28,9 +28,6 @@ import java.util.HashSet;
 public class GoBoardView extends View implements GoControl.Callback {
     private Drawable mExampleDrawable;
 
-    private float mTextWidth;
-    private float mTextHeight;
-
     private final static int OPAQUE_ALPHA = 255;
     private final static int GHOST_ALPHA = 150;
 
@@ -43,8 +40,6 @@ public class GoBoardView extends View implements GoControl.Callback {
     private int board_square_size = -1;
 
     private GoControl go_control = null;
-
-    private final int BL_STROKE_SIZE = 2;
 
     private int ssize = 1;
     private int start_p;
@@ -313,7 +308,7 @@ public class GoBoardView extends View implements GoControl.Callback {
 
         int [] flower_pos;
 
-        /* draw flower point */
+        /* draw star point */
         if (board_size >= 19) {
 
             flower_pos = new int[] {
@@ -456,12 +451,12 @@ public class GoBoardView extends View implements GoControl.Callback {
         if (go_control == null)
             return;
 
-        Resources res = getContext().getResources();
+        Context ctx = getContext();
 
         if (stone_color == GoControl.Player.BLACK)
-            image = res.getDrawable(R.drawable.go_b_no_bg);
+            image = ctx.getDrawable(R.drawable.go_b_no_bg);
         else
-            image = res.getDrawable(R.drawable.go_w_no_bg);
+            image = ctx.getDrawable(R.drawable.go_w_no_bg);
 
         tmph = tmpw = (int)(board_square_size / 2);
 

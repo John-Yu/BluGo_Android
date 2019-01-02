@@ -14,9 +14,11 @@
         android:id="@+id/text2"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:autoLink="web"
         android:text="@string/about_license"
         android:textColor="#000000"
-        android:autoLink="web"
-        />
+        tools:text="@string/about_license" />
 
 </RelativeLayout>

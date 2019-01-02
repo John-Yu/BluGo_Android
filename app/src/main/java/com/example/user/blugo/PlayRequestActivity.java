@@ -1,7 +1,7 @@
 package com.example.user.blugo;
 
 import android.Manifest;
-import android.app.ProgressDialog;
+import android.widget.ProgressBar;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
@@ -21,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -36,7 +35,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
     private ListView dev_listview;
     private ArrayList<BluetoothDeviceWrap> device_array;
     private BluetoothAdapter mBluetoothAdapter;
-    private ArrayAdapter arrayAdapter;
+    private ArrayAdapter<BluetoothDeviceWrap> arrayAdapter;
     private SingleReceiver mReceiver = null;
     private ProgressBar pbar_discover;
     public Handler msg_handler = new Handler(this);
@@ -44,7 +43,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
     private Spinner sp_rule, sp_board_size, sp_wb, sp_handicap;
     private EditText komi;
 
-    private ProgressDialog load_progress = null;
+    private ProgressBar load_progress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +51,8 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         setContentView(R.layout.activity_play_request);
 
         dev_listview = (ListView) findViewById(R.id.device_list);
-        device_array = new ArrayList<BluetoothDeviceWrap>();
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, device_array);
+        device_array = new ArrayList<>();
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, device_array);
         dev_listview.setAdapter(arrayAdapter);
         dev_listview.setOnItemClickListener(
             new AdapterView.OnItemClickListener() {
@@ -77,13 +76,9 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
                     client.start();
 
                     /* pop-up wait dialog */
-                    load_progress = new ProgressDialog(PlayRequestActivity.this);
-                    load_progress.setCancelable(false);
-                    load_progress.setMessage(getString(R.string.waiting_response) + "...");
-                    load_progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    load_progress = new ProgressBar(PlayRequestActivity.this);
                     load_progress.setProgress(0);
                     load_progress.setMax(100);
-                    load_progress.show();
                 }
             }
         );
@@ -286,7 +281,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         switch (msg.what) {
             case GoMessageListener.BLUTOOTH_CLIENT_SOCKET_ERROR:
                 if (load_progress != null)
-                    load_progress.dismiss();
+                    load_progress.setVisibility(View.GONE);     // To Hide ProgressBar
                 Toast.makeText(this, (String) msg.obj, Toast.LENGTH_SHORT).show();
                 break;
             case GoMessageListener.BLUTOOTH_CLIENT_CONNECT_SUCCESS:
@@ -329,7 +324,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         switch (msg.type) {
             case REQUEST_PLAY_ACK:
                 if (load_progress != null)
-                    load_progress.dismiss();
+                    load_progress.setVisibility(View.GONE);     // To Hide ProgressBar
 
                 Log.d("CLIENT", "PLAY_ACK RECEIVED");
                 tmp = (Integer) msg.content;

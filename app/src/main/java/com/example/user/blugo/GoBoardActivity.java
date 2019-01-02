@@ -1,13 +1,8 @@
 package com.example.user.blugo;
 
-import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
+import android.widget.ProgressBar;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.NavUtils;
@@ -17,25 +12,15 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class GoBoardActivity extends AppCompatActivity implements FileChooser.FileSelectedListener, GoBoardViewListener {
     private GoBoardView gv;
     private TextView txt_info;
     private GoControl single_game;
-    private ProgressDialog progressBar;
+    private ProgressBar progressBar;
     private String sgf_string = null;
     private File file;
 
@@ -202,13 +187,10 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
 
     @Override
     public void fileSelected(File file) {
-        progressBar = new ProgressDialog(this);
-        progressBar.setCancelable(true);
-        progressBar.setMessage("Loading SGF ...");
-        progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressBar = new ProgressBar(this);
         progressBar.setProgress(0);
         progressBar.setMax(100);
-        progressBar.show();
+        progressBar.setVisibility(View.VISIBLE);  //To show ProgressBar
 
         this.file = file;
 
@@ -259,7 +241,8 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                 case GoMessageListener.MSG_LOAD_END:
                     gv.invalidate();
                     txt_info.setText(get_info_text());
-                    progressBar.dismiss();
+                    progressBar.setVisibility(View.GONE);
+                    ;
                     return true;
             }
             return false;
