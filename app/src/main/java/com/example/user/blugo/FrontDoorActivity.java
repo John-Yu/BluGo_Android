@@ -7,15 +7,14 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.AudioManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,17 +26,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.TooManyListenersException;
 
 public class FrontDoorActivity extends AppCompatActivity implements FileChooser.FileSelectedListener,
-    Handler.Callback, DialogInterface.OnDismissListener, GoMessageListener,
-    AdapterView.OnItemSelectedListener {
+        Handler.Callback, DialogInterface.OnDismissListener, GoMessageListener,
+        AdapterView.OnItemSelectedListener {
     public Handler msg_handler = new Handler(this);
 
     public final static int REQUEST_ENABLE_BT = 1;
@@ -69,7 +66,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_Light_Dialog);
             dialog_rq_confirm = new Dialog(this,
-                android.R.style.Theme_DeviceDefault_Light_Dialog);
+                    android.R.style.Theme_DeviceDefault_Light_Dialog);
         } else {
             dialog = new Dialog(this);
             dialog_rq_confirm = new Dialog(this);
@@ -110,11 +107,10 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         }
     }
 
-        public void load_SGF(View view)
-    {
+    public void load_SGF(View view) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
             return;
         }
 
@@ -125,8 +121,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         f.showDialog();
     }
 
-    public void start_single_game(View view)
-    {
+    public void start_single_game(View view) {
 
         AlertDialog alert;
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -149,7 +144,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         sp_board_size = (Spinner) layout.findViewById(R.id.sp_board_size);
         List<Integer> bd_size = new ArrayList<Integer>();
 
-        for (int i = 19 ; i >= 3 ; i -= 2) {
+        for (int i = 19; i >= 3; i -= 2) {
             bd_size.add(i);
         }
 
@@ -163,7 +158,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         sp_handicap = (Spinner) layout.findViewById(R.id.sp_handicap);
         List<Integer> handicap = new ArrayList<>();
         handicap.add(0);
-        for (int i = 2 ; i <= 9 ; i++)
+        for (int i = 2; i <= 9; i++)
             handicap.add(i);
         handicap.add(13);
         handicap.add(16);
@@ -176,42 +171,41 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         AlertDialog.Builder builder;
         builder = new AlertDialog.Builder(this);
         builder
-            .setView(layout)
-            .setTitle(getString(R.string.game_setting))
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Message msg;
-                    GoPlaySetting setting = new GoPlaySetting();
+                .setView(layout)
+                .setTitle(getString(R.string.game_setting))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Message msg;
+                        GoPlaySetting setting = new GoPlaySetting();
 
-                    setting.handicap = (Integer) sp_handicap.getSelectedItem();
-                    setting.size = (Integer) sp_board_size.getSelectedItem();
-                    setting.rule = sp_rule.getSelectedItemPosition();
-                    try {
-                        setting.komi = Float.parseFloat(komi.getText().toString());
-                    } catch (NumberFormatException e) {
-                        Log.d("EXP", "'" + komi.getText().toString() + "'" +
-                            " cannot be converted to float");
-                        setting.komi = (setting.rule == 0) ? 6.5f : 7.5f;
+                        setting.handicap = (Integer) sp_handicap.getSelectedItem();
+                        setting.size = (Integer) sp_board_size.getSelectedItem();
+                        setting.rule = sp_rule.getSelectedItemPosition();
+                        try {
+                            setting.komi = Float.parseFloat(komi.getText().toString());
+                        } catch (NumberFormatException e) {
+                            Log.d("EXP", "'" + komi.getText().toString() + "'" +
+                                    " cannot be converted to float");
+                            setting.komi = (setting.rule == 0) ? 6.5f : 7.5f;
+                        }
+
+                        if (setting.handicap > 0 && setting.size < 19) {
+                            setting.handicap = 0;
+                        }
+
+                        msg = Message.obtain(FrontDoorActivity.this.msg_handler,
+                                SINGLE_GAME_SETTING_FINISHED, setting);
+                        FrontDoorActivity.this.msg_handler.sendMessage(msg);
                     }
-
-                    if (setting.handicap > 0 && setting.size < 19) {
-                        setting.handicap = 0;
-                    }
-
-                    msg = Message.obtain(FrontDoorActivity.this.msg_handler,
-                        SINGLE_GAME_SETTING_FINISHED, setting);
-                    FrontDoorActivity.this.msg_handler.sendMessage(msg);
-                }
-            })
-            .setNegativeButton(android.R.string.cancel, null);
+                })
+                .setNegativeButton(android.R.string.cancel, null);
 
         alert = builder.create();
         alert.show();
     }
 
-    private Boolean enableBluetooth()
-    {
+    private Boolean enableBluetooth() {
         if (mBluetoothAdapter == null)
             mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -229,8 +223,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         return false;
     }
 
-    public void wait_game_request(View view)
-    {
+    public void wait_game_request(View view) {
         if (enableBluetooth() == false)
             return;
 
@@ -246,7 +239,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
          */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             macAddress = android.provider.Settings.Secure.getString(this.getContentResolver(),
-                "bluetooth_address");
+                    "bluetooth_address");
         } else {
             macAddress = mBluetoothAdapter.getAddress();
         }
@@ -264,16 +257,14 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         dialog.show();
     }
 
-    public void enable_discover(View view)
-    {
+    public void enable_discover(View view) {
         /* goto discoverable mode */
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivity(discoverableIntent);
     }
 
-    public void request_play(View view)
-    {
+    public void request_play(View view) {
         if (enableBluetooth() == false)
             return;
 
@@ -296,7 +287,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                 intent = new Intent(this, ReviewGameActivity.class);
                 intent.putExtra(EXTRA_MESSAGE, (String) msg.obj);
                 startActivity(intent);
-		/* sgf_string = null;*/
+                /* sgf_string = null;*/
                 return true;
 
             case GoMessageListener.BLUTOOTH_SERVER_SOCKET_ERROR:
@@ -305,7 +296,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                     server.cancel();
                     try {
                         server.join();
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                     server = null;
                 }
                 break;
@@ -326,7 +318,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                 Log.d("SERVER", "REQUEST_PLAY RECEIVED");
                 server = BlutoothServerThread.getInstance();
                 m = BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_PLAY_ACK,
-                    new Integer(my_color == 0 ? 1 : 0));
+                        new Integer(my_color == 0 ? 1 : 0));
                 server.get_connected().write(m);
 
                 setting.wb = my_color;
@@ -370,8 +362,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         return false;
     }
 
-    private void handle_comm_message(BlutoothMsgParser.MsgParsed msg)
-    {
+    private void handle_comm_message(BlutoothMsgParser.MsgParsed msg) {
         switch (msg.type) {
             case REQUEST_PLAY:
                 BlutoothServerThread server = BlutoothServerThread.getInstance();
@@ -380,7 +371,6 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                     break;
 
                 setting = (GoPlaySetting) msg.content;
-
 
 
                 dialog.dismiss();
@@ -394,7 +384,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
 
                 TextView tmp = (TextView) dialog_rq_confirm.findViewById(R.id.txt_rule);
                 tmp.setText(setting.rule == 0 ?
-			    getString(R.string.rule_japanese) : getString(R.string.rule_chinese));
+                        getString(R.string.rule_japanese) : getString(R.string.rule_chinese));
 
                 tmp = (TextView) dialog_rq_confirm.findViewById(R.id.txt_handicap);
                 tmp.setText(setting.handicap + "");
@@ -419,8 +409,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                     @Override
                     public void onClick(View v) {
                         Message msg = Message.obtain(msg_handler,
-                            GoMessageListener.BLUTOOTH_COMM_ACCEPTED_REQUEST,
-                            "connection success");
+                                GoMessageListener.BLUTOOTH_COMM_ACCEPTED_REQUEST,
+                                "connection success");
                         msg_handler.sendMessage(msg);
                         dialog_rq_confirm.dismiss();
                     }
@@ -432,7 +422,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                         BlutoothServerThread server = BlutoothServerThread.getInstance();
                         String m;
                         m = BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_PLAY_ACK,
-                            -1);
+                                -1);
                         server.get_connected().write(m);
 
                         BlutoothClientThread client;
@@ -444,7 +434,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                             comm.cancel();
                             try {
                                 comm.join();
-                            } catch (InterruptedException e) {}
+                            } catch (InterruptedException e) {
+                            }
                         }
 
                         /* stop server */
@@ -453,7 +444,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                             server.cancel();
                             try {
                                 server.join();
-                            } catch (InterruptedException e) {}
+                            } catch (InterruptedException e) {
+                            }
                         }
                         dialog_rq_confirm.dismiss();
                     }
@@ -487,7 +479,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         server.cancel();
         try {
             server.join();
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
     }
 
     @Override

@@ -1,5 +1,8 @@
+ # BluGo Interface
+![screenshot](/app/misc/device_en_2.png?raw=true)
+
  # Introduction
-   BluGo is a free open-source Android GO board game program.  
+**BluGo** is a free open-source Android GO board game program.  
    It supports 1:1 game with another human player using bluetooth.   
    This project forked from [chykrkr's BluGo_Android](https://github.com/chykrkr/BluGo_Android),  thank chykrkr.   
    You can download source code from  [GITHUB](https://github.com/John-Yu/BluGo_Android) 
@@ -8,7 +11,7 @@
  The way of place stone is almost like the habit of human beings. Touch-Move-Up
  - Touch: A large cross cursor will appear to conveniently indicate the coordinates of the touch point
  - Move: When you move your finger, the cursor follow it
- - Up: When you raise your finger, the stone will put at cursor point
+ - Up: When you raise your finger, the stone will be put at cursor point
  
  # Todo
 

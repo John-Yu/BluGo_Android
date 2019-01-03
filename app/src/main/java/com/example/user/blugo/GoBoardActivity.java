@@ -190,6 +190,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         progressBar = new ProgressBar(this);
         progressBar.setProgress(0);
         progressBar.setMax(100);
+        progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);  //To show ProgressBar
 
         this.file = file;

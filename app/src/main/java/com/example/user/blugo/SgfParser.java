@@ -1,11 +1,8 @@
 package com.example.user.blugo;
 
 import android.graphics.Point;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,31 +17,33 @@ public class SgfParser {
         BLACK_PUT,
         WHITE_PASS,
         BLACK_PASS,
-        TERRITORY_WHITE,
-        TERRITORY_BLACK,
+        TERRITORY_WHITE, /*Specifies the white territory or area*/
+        TERRITORY_BLACK, /*Specifies the black territory or area*/
         RULE,
         RESULT,
         ADD_BLACK,
         ADD_WHITE,
-        HANDICAP,
+        HANDICAP, /*Defines the number of handicap stones (>=2).*/
+        COMMENT,
         UNKNOWN,
     }
 
     private static String[] ItemType_ID = {
-        "SZ",
-        "KM",
-        "W",
-        "B",
-        "????",
-        "????",
-        "TW",
-        "TB",
-        "RU",
-        "RE",
-        "AB",
-        "AW",
-        "HA",
-        "????",
+            "SZ",
+            "KM",
+            "W",
+            "B",
+            "????",
+            "????",
+            "TW",
+            "TB",
+            "RU",
+            "RE",
+            "AB",
+            "AW",
+            "HA",
+            "C",
+            "????",
     };
 
     public static class ParsedItem {
@@ -66,9 +65,9 @@ public class SgfParser {
         ArrayList<ParsedItem> result;
 
         /* Find pattern ';.*?' */
-	Matcher m = semicolon.matcher(sgf_string);
+        Matcher m = semicolon.matcher(sgf_string);
 
-	while (m.find()) {
+        while (m.find()) {
             if (m.groupCount() < 1)
                 continue;
             /* Find commands */
@@ -76,13 +75,12 @@ public class SgfParser {
 
             if (result != null)
                 parsed_item.addAll(result);
-	}
+        }
 
         return parsed_item;
     }
 
-    private ParsedItem parse_opt_board_size(String opt)
-    {
+    private ParsedItem parse_opt_board_size(String opt) {
         ParsedItem parsed = null;
         Integer size;
 
@@ -102,8 +100,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_opt_handicap(String opt)
-    {
+    private ParsedItem parse_opt_handicap(String opt) {
         ParsedItem parsed = null;
         Integer value;
 
@@ -123,8 +120,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_opt_komi(String opt)
-    {
+    private ParsedItem parse_opt_komi(String opt) {
         ParsedItem parsed = null;
         Float value;
 
@@ -144,8 +140,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_rule(String opt)
-    {
+    private ParsedItem parse_rule(String opt) {
         ParsedItem parsed = null;
         GoRule.RuleID rule = GoRule.RuleID.JAPANESE;
 
@@ -165,10 +160,9 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_result(String opt)
-    {
+    private ParsedItem parse_result(String opt) {
         ParsedItem parsed = null;
-        Object [] result = new Object[2];
+        Object[] result = new Object[2];
 
         if (opt == null || opt.length() < 1)
             return null;
@@ -204,15 +198,14 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_add_white(String opt)
-    {
+    private ParsedItem parse_add_white(String opt) {
         ParsedItem parsed = null;
         char c;
         Point p;
         int x, y;
 
         if (opt == null || opt.length() < 1) {
-            return  parsed;
+            return parsed;
         }
 
         Matcher m = position.matcher(opt);
@@ -222,14 +215,14 @@ public class SgfParser {
 
         c = opt.charAt(0);
         if (c >= 'a' && c <= 'z') {
-            x = (int) c -  (int) 'a';
+            x = (int) c - (int) 'a';
         } else {
-            x = (int) c -  (int) 'A' + 25;
+            x = (int) c - (int) 'A' + 25;
         }
 
         c = opt.charAt(1);
         if (c >= 'a' && c <= 'z') {
-            y = (int) c -  (int) 'a';
+            y = (int) c - (int) 'a';
         } else {
             y = (int) c - (int) 'A' + 25;
         }
@@ -243,15 +236,14 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_add_black(String opt)
-    {
+    private ParsedItem parse_add_black(String opt) {
         ParsedItem parsed = null;
         char c;
         Point p;
         int x, y;
 
         if (opt == null || opt.length() < 1) {
-            return  parsed;
+            return parsed;
         }
 
         Matcher m = position.matcher(opt);
@@ -261,14 +253,14 @@ public class SgfParser {
 
         c = opt.charAt(0);
         if (c >= 'a' && c <= 'z') {
-            x = (int) c -  (int) 'a';
+            x = (int) c - (int) 'a';
         } else {
-            x = (int) c -  (int) 'A' + 25;
+            x = (int) c - (int) 'A' + 25;
         }
 
         c = opt.charAt(1);
         if (c >= 'a' && c <= 'z') {
-            y = (int) c -  (int) 'a';
+            y = (int) c - (int) 'a';
         } else {
             y = (int) c - (int) 'A' + 25;
         }
@@ -282,8 +274,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_white_put(String opt)
-    {
+    private ParsedItem parse_white_put(String opt) {
         ParsedItem parsed = null;
         char c;
         Point p;
@@ -293,7 +284,7 @@ public class SgfParser {
             parsed = new ParsedItem();
             parsed.type = ItemType.WHITE_PASS;
             parsed.content = null;
-            return  parsed;
+            return parsed;
         }
 
         Matcher m = position.matcher(opt);
@@ -303,14 +294,14 @@ public class SgfParser {
 
         c = opt.charAt(0);
         if (c >= 'a' && c <= 'z') {
-            x = (int) c -  (int) 'a';
+            x = (int) c - (int) 'a';
         } else {
-            x = (int) c -  (int) 'A' + 25;
+            x = (int) c - (int) 'A' + 25;
         }
 
         c = opt.charAt(1);
         if (c >= 'a' && c <= 'z') {
-            y = (int) c -  (int) 'a';
+            y = (int) c - (int) 'a';
         } else {
             y = (int) c - (int) 'A' + 25;
         }
@@ -324,8 +315,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_black_put(String opt)
-    {
+    private ParsedItem parse_black_put(String opt) {
         ParsedItem parsed = null;
         char c;
         Point p;
@@ -335,7 +325,7 @@ public class SgfParser {
             parsed = new ParsedItem();
             parsed.type = ItemType.BLACK_PASS;
             parsed.content = null;
-            return  parsed;
+            return parsed;
         }
 
         Matcher m = position.matcher(opt);
@@ -345,14 +335,14 @@ public class SgfParser {
 
         c = opt.charAt(0);
         if (c >= 'a' && c <= 'z') {
-            x = (int) c -  (int) 'a';
+            x = (int) c - (int) 'a';
         } else {
-            x = (int) c -  (int) 'A' + 25;
+            x = (int) c - (int) 'A' + 25;
         }
 
         c = opt.charAt(1);
         if (c >= 'a' && c <= 'z') {
-            y = (int) c -  (int) 'a';
+            y = (int) c - (int) 'a';
         } else {
             y = (int) c - (int) 'A' + 25;
         }
@@ -366,8 +356,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_territory_black(String opt)
-    {
+    private ParsedItem parse_territory_black(String opt) {
         ParsedItem parsed = null;
         char c;
         Point p;
@@ -380,14 +369,14 @@ public class SgfParser {
 
         c = opt.charAt(0);
         if (c >= 'a' && c <= 'z') {
-            x = (int) c -  (int) 'a';
+            x = (int) c - (int) 'a';
         } else {
-            x = (int) c -  (int) 'A' + 25;
+            x = (int) c - (int) 'A' + 25;
         }
 
         c = opt.charAt(1);
         if (c >= 'a' && c <= 'z') {
-            y = (int) c -  (int) 'a';
+            y = (int) c - (int) 'a';
         } else {
             y = (int) c - (int) 'A' + 25;
         }
@@ -401,8 +390,7 @@ public class SgfParser {
         return parsed;
     }
 
-    private ParsedItem parse_territory_white(String opt)
-    {
+    private ParsedItem parse_territory_white(String opt) {
         ParsedItem parsed = null;
         char c;
         Point p;
@@ -415,14 +403,14 @@ public class SgfParser {
 
         c = opt.charAt(0);
         if (c >= 'a' && c <= 'z') {
-            x = (int) c -  (int) 'a';
+            x = (int) c - (int) 'a';
         } else {
-            x = (int) c -  (int) 'A' + 25;
+            x = (int) c - (int) 'A' + 25;
         }
 
         c = opt.charAt(1);
         if (c >= 'a' && c <= 'z') {
-            y = (int) c -  (int) 'a';
+            y = (int) c - (int) 'a';
         } else {
             y = (int) c - (int) 'A' + 25;
         }
@@ -436,38 +424,36 @@ public class SgfParser {
         return parsed;
     }
 
-    private ArrayList<String> split_options(String text)
-    {
-	ArrayList<String> result = new ArrayList<>();
-	Matcher m = options.matcher(text);
+    private ArrayList<String> split_options(String text) {
+        ArrayList<String> result = new ArrayList<>();
+        Matcher m = options.matcher(text);
 
-	while (m.find()) {
-	    result.add(m.group(1));
-	}
+        while (m.find()) {
+            result.add(m.group(1));
+        }
 
         return result;
     }
 
-    private ArrayList<ParsedItem> find_commands(String text)
-    {
+    private ArrayList<ParsedItem> find_commands(String text) {
         String cmd, opt_string, opt;
         Matcher m = command.matcher(text);
         ItemType type = ItemType.UNKNOWN;
         ArrayList<ParsedItem> parsed_items = new ArrayList<>();
         ParsedItem parsed = null;
         int i;
-	ArrayList<String> opts;
+        ArrayList<String> opts;
 
         while (m.find()) {
             cmd = m.group(1);
             opt_string = m.group(2);
 
-	    opts = split_options(opt_string);
-	    opt = opts.get(0);
+            opts = split_options(opt_string);
+            opt = opts.get(0);
 
             type = ItemType.UNKNOWN;
 
-            for (i = 0 ; i < ItemType_ID.length ; i++) {
+            for (i = 0; i < ItemType_ID.length; i++) {
                 if (cmd.equals(ItemType_ID[i])) {
                     type = ItemType.values()[i];
                     break;
@@ -476,23 +462,21 @@ public class SgfParser {
 
             switch (type) {
                 case BOARD_SIZE:
-		    parsed = parse_opt_board_size(opt);
-		    if (parsed != null)
-			parsed_items.add(parsed);
+                    parsed = parse_opt_board_size(opt);
+                    if (parsed != null)
+                        parsed_items.add(parsed);
                     break;
 
                 case KOMI:
-		    parsed = parse_opt_komi(opt);
-		    if (parsed != null)
-			parsed_items.add(parsed);
+                    parsed = parse_opt_komi(opt);
+                    if (parsed != null)
+                        parsed_items.add(parsed);
                     break;
-
                 case HANDICAP:
                     parsed = parse_opt_handicap(opt);
                     if (parsed != null)
                         parsed_items.add(parsed);
                     break;
-
                 case WHITE_PUT:
                     parsed = parse_white_put(opt);
                     if (parsed != null)
@@ -549,9 +533,7 @@ public class SgfParser {
                         parsed_items.add(parsed);
                     break;
             }
-
         }
-
         return parsed_items;
     }
 }

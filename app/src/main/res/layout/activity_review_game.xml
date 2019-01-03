@@ -108,4 +108,15 @@
             android:textColor="#ffffff"/>
     </RelativeLayout>
 
+    <ProgressBar
+        android:id="@+id/view_progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:indeterminate="true"
+        android:max="100"
+        android:visibility="invisible" />
+
 </RelativeLayout>

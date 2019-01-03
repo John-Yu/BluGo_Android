@@ -79,12 +79,14 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
                     load_progress = new ProgressBar(PlayRequestActivity.this);
                     load_progress.setProgress(0);
                     load_progress.setMax(100);
+                    load_progress.setIndeterminate(true);
+                    load_progress.setVisibility(View.VISIBLE);
                 }
             }
         );
 
         pbar_discover = (ProgressBar) findViewById(R.id.discover_on_progress);
-        pbar_discover.setVisibility(View.INVISIBLE);
+        pbar_discover.setVisibility(View.VISIBLE);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         listBluetoothDevice();

@@ -33,7 +33,7 @@ public class GoControlReview extends GoControlSingle {
         GoAction last_action;
         last_action = history.get(cur_pos - 1);
 
-        return (last_action.player == Player.WHITE)? Player.BLACK : Player.WHITE;
+        return (last_action.player == Player.WHITE) ? Player.BLACK : Player.WHITE;
     }
 
     @Override
@@ -57,15 +57,13 @@ public class GoControlReview extends GoControlSingle {
         return false;
     }
 
-    public int get_last_pos()
-    {
+    public int get_last_pos() {
         ArrayList<NewBoardState> time_line;
         time_line = rule.get_time_line();
         return time_line.size() - 1;
     }
 
-    public NewBoardState get_current_board_state()
-    {
+    public NewBoardState get_current_board_state() {
         ArrayList<NewBoardState> time_line;
 
         time_line = rule.get_time_line();
@@ -73,11 +71,10 @@ public class GoControlReview extends GoControlSingle {
         return time_line.get(cur_pos);
     }
 
-    public synchronized boolean goto_pos(int pos)
-    {
+    public synchronized boolean goto_pos(int pos) {
         ArrayList<NewBoardState> time_line;
 
-        if (pos < 0 )
+        if (pos < 0)
             return false;
 
         time_line = rule.get_time_line();

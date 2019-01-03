@@ -1,19 +1,19 @@
 package com.example.user.blugo;
 
 import android.app.AlertDialog;
-import android.widget.ProgressBar;
 import android.content.Intent;
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-public class ReviewGameActivity extends AppCompatActivity implements  GoBoardViewListener, SeekBar.OnSeekBarChangeListener{
+public class ReviewGameActivity extends AppCompatActivity implements GoBoardViewListener, SeekBar.OnSeekBarChangeListener {
     public Handler msg_handler = new Handler(new GoMsgHandler());
     public Handler view_msg_handler = new Handler(new ViewMessageHandler());
 
@@ -42,7 +42,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review_game);
 
-	Intent intent = getIntent();
+        Intent intent = getIntent();
         sgf_path = intent.getStringExtra(FrontDoorActivity.EXTRA_MESSAGE);
 
         gv = (GoBoardView) findViewById(R.id.go_board_view);
@@ -61,6 +61,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
 
         button = (Button) findViewById(R.id.btn_variation);
         btn_detail = (Button) findViewById(R.id.btn_detail);
+        load_progress = (ProgressBar) findViewById(R.id.view_progressBar);
     }
 
     @Override
@@ -69,13 +70,11 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
         gv.release_memory();
     }
 
-    private void load_sgf()
-    {
+    private void load_sgf() {
         GoActivityUtil.getInstance().load_sgf(this, sgf_path, game, msg_handler);
     }
 
-    private void set_button_enables()
-    {
+    private void set_button_enables() {
         if (game.calc_mode()) {
             button.setEnabled(false);
         } else {
@@ -83,16 +82,14 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
         }
     }
 
-    private class GoMsgHandler implements Handler.Callback
-    {
+    private class GoMsgHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
             String tmp;
 
-
             switch (msg.what) {
                 case GoMessageListener.MSG_LOAD_END:
-                    load_progress = (ProgressBar) msg.obj;
+                    load_progress.setVisibility(View.INVISIBLE); //
 
                     sbar.setMax(game.get_last_pos());
                     sbar.setProgress(game.getCur_pos());
@@ -104,16 +101,22 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
 
                     text_result.setText(game.get_determined_result_string());
 
-                    /* Must be after statement load_progress = ... */
                     gv.invalidate();
-                    return true;
+                    break;
+                case GoMessageListener.MSG_LOAD_FAIL:
+                    load_progress.setVisibility(View.GONE); //
+                    break;
+                case GoMessageListener.MSG_LOAD_BEGIN:
+                    load_progress.setVisibility(View.VISIBLE); // Show the progressBar
+                    break;
+                default:
+                    return false;
             }
-            return false;
+            return true;
         }
     }
 
-    private class ViewMessageHandler implements Handler.Callback
-    {
+    private class ViewMessageHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
             String tmp;
@@ -123,9 +126,8 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
                         Log.d("DEBUG", "TEST");
                         load_sgf();
                         need_to_load = !need_to_load;
-                    } else if (load_progress != null) {
+                    } else {
                         load_progress.setVisibility(View.GONE);     // To Hide ProgressBar
-                        load_progress = null;
                     }
                     return true;
             }
@@ -162,8 +164,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
 
     }
 
-    public void try_varation(View view)
-    {
+    public void try_varation(View view) {
         Intent intent = new Intent(this, GoBoardActivity.class);
         Bundle bundle = new Bundle();
         GoPlaySetting setting = game.get_game_setting();
@@ -179,8 +180,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
         startActivity(intent);
     }
 
-    public void goto_next_move(View view)
-    {
+    public void goto_next_move(View view) {
         int progress = sbar.getProgress();
         int max = sbar.getMax();
 
@@ -190,8 +190,7 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
         sbar.setProgress(progress);
     }
 
-    public void goto_prev_move(View view)
-    {
+    public void goto_prev_move(View view) {
         int progress = sbar.getProgress();
 
         if (--progress < 0)
@@ -200,26 +199,25 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
         sbar.setProgress(progress);
     }
 
-    public void check_detail(View view)
-    {
+    public void check_detail(View view) {
         AlertDialog.Builder builder;
 
         String message = "";
-        GoControl.GoInfo info =  game.get_info();
+        GoControl.GoInfo info = game.get_info();
         GoRule.RuleID rule = game.get_rule();
 
         message += getString(R.string.rule) + " : " + rule.toString() + "\n";
 
         if (game.calc_mode()) {
             message += String.format(getString(R.string.dead_black) + "  : %d, " +
-				     getString(R.string.dead_white) + "  : %d\n",
-				     info.black_dead, info.white_dead);
+                            getString(R.string.dead_white) + "  : %d\n",
+                    info.black_dead, info.white_dead);
             message += String.format(getString(R.string.white_tr) + " : %d, " +
-				     getString(R.string.black_tr) + " : %d\n",
-				     info.white_score, info.black_score);
+                            getString(R.string.black_tr) + " : %d\n",
+                    info.white_score, info.black_score);
             message += String.format(getString(R.string.live_white) + "      : %d, " +
-				     getString(R.string.live_black) + "      : %d\n",
-				     info.white_count, info.black_count);
+                            getString(R.string.live_black) + "      : %d\n",
+                    info.white_count, info.black_count);
             message += String.format(getString(R.string.komi) + " : %.1f\n", info.komi);
             message += String.format(getString(R.string.white_total) + ": %.1f\n", info.white_final);
             message += String.format(getString(R.string.black_total) + ": %.1f\n", info.black_final);
@@ -239,9 +237,9 @@ public class ReviewGameActivity extends AppCompatActivity implements  GoBoardVie
 
         builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
-            .setTitle(getString(R.string.information))
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok, null);
+                .setTitle(getString(R.string.information))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, null);
 
         AlertDialog alert = builder.create();
         alert.show();
