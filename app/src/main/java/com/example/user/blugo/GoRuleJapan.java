@@ -1,11 +1,8 @@
 package com.example.user.blugo;
 
-import android.graphics.Point;
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Objects;
 
 /**
  * Created by user on 2016-06-02.
@@ -15,16 +12,15 @@ public class GoRuleJapan extends GoRule {
     private ArrayList<GoControl.GoAction> action_history = new ArrayList<>();
     private int seq_no = 0;
 
-    private GoRuleJapan() {}
+    private GoRuleJapan() {
+    }
 
-    GoRuleJapan(int board_size)
-    {
+    GoRuleJapan(int board_size) {
         /* Always add single empty board */
         new_timeline.add(new NewBoardState(board_size));
     }
 
-    GoRuleJapan(NewBoardState initial_time_line)
-    {
+    GoRuleJapan(NewBoardState initial_time_line) {
         new_timeline.add(initial_time_line);
     }
 
@@ -50,8 +46,7 @@ public class GoRuleJapan extends GoRule {
         return action_history;
     }
 
-    public void pass(GoControl.Player next_turn)
-    {
+    public void pass(GoControl.Player next_turn) {
         NewBoardState state = null;
 
         /* copy time line */
@@ -63,10 +58,10 @@ public class GoRuleJapan extends GoRule {
         }
 
         action_history.add(new GoControl.GoAction(
-            (next_turn == GoControl.Player.BLACK)? GoControl.Player.WHITE : GoControl.Player.BLACK,
-            null, GoControl.Action.PASS));
+                (next_turn == GoControl.Player.BLACK) ? GoControl.Player.WHITE : GoControl.Player.BLACK,
+                null, GoControl.Action.PASS));
 
-        state.ko_x = state.ko_y = -1;
+        Objects.requireNonNull(state).ko_x = state.ko_y = -1;
         seq_no++;
         new_timeline.add(state);
     }
@@ -85,7 +80,7 @@ public class GoRuleJapan extends GoRule {
 
         pos = new GoControl.GoAction(stone_color, x, y);
 
-        if (!state.put_stone(pos)) {
+        if (!Objects.requireNonNull(state).put_stone(pos)) {
             state = null;
             return false;
         }
@@ -102,8 +97,7 @@ public class GoRuleJapan extends GoRule {
     }
 
     @Override
-    public boolean undo()
-    {
+    public boolean undo() {
         if (new_timeline.size() <= 1)
             return false;
 
@@ -122,8 +116,7 @@ public class GoRuleJapan extends GoRule {
     }
 
     @Override
-    public void get_score(GoControl.GoInfo info)
-    {
+    public void get_score(GoControl.GoInfo info) {
         NewBoardState state = new_timeline.get(new_timeline.size() - 1);
         state.get_score(info);
 
@@ -134,8 +127,7 @@ public class GoRuleJapan extends GoRule {
     }
 
     @Override
-    public void cancel_calc()
-    {
+    public void cancel_calc() {
         new_timeline.remove(new_timeline.size() - 1);
     }
 
@@ -150,7 +142,7 @@ public class GoRuleJapan extends GoRule {
         } catch (CloneNotSupportedException e) {
             e.printStackTrace();
         }
-        state.prepare_calc();
+        Objects.requireNonNull(state).prepare_calc();
 
         new_timeline.add(state);
     }

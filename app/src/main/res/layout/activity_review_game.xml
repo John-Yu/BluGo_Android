@@ -45,14 +45,14 @@
     </LinearLayout>
 
     <com.example.user.blugo.GoBoardView
+        android:id="@+id/go_board_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/go_board_view"
-        app:exampleDrawable="@drawable/board"
         android:layout_above="@+id/layout_bottom"
-        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/layout_top"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/layout_top"/>
+        android:layout_alignParentLeft="false"
+        app:exampleDrawable="@drawable/board" />
 
 
 
@@ -91,14 +91,17 @@
             android:onClick="goto_next_move"/>
 
         <SeekBar
+            android:id="@+id/seek_pos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/seek_pos"
-            android:layout_toRightOf="@id/btn_prev"
-            android:layout_toLeftOf="@id/btn_next"
-            android:max="100"
-            android:layout_centerInParent="true"
-            android:indeterminate="false"/>
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="0dp"
+            android:layout_marginRight="0dp"
+            android:layout_toStartOf="@+id/btn_next"
+            android:layout_toEndOf="@+id/btn_prev"
+            android:indeterminate="false"
+            android:max="100" />
 
         <TextView
             android:layout_width="wrap_content"

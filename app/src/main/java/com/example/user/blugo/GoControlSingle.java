@@ -1,13 +1,11 @@
 package com.example.user.blugo;
 
-import android.content.Context;
 import android.graphics.Point;
 import android.util.Log;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Objects;
 
 /**
  * Created by user on 2016-06-02.
@@ -36,10 +34,10 @@ public class GoControlSingle extends GoControl {
 
     private int handicap = 0;
 
-    private Object [] determined_result = null;
+    private Object[] determined_result = null;
 
     GoControlSingle() {
-        this(19, Player.BLACK, null, new GoRuleJapan(19),0);
+        this(19, Player.BLACK, null, new GoRuleJapan(19), 0);
     }
 
     GoControlSingle(Callback callback_receiver) {
@@ -57,13 +55,13 @@ public class GoControlSingle extends GoControl {
     GoControlSingle(int board_size, Player current_turn, float komi, int handicap, GoRule rule,
                     int start_turn) {
         this(board_size, current_turn, null, rule,
-            start_turn, komi, handicap);
+                start_turn, komi, handicap);
     }
 
     GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
                     int start_turn) {
         this(board_size, current_turn, callback_receiver, rule,
-        start_turn, 6.5f, 0);
+                start_turn, 6.5f, 0);
     }
 
     GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
@@ -78,10 +76,7 @@ public class GoControlSingle extends GoControl {
     }
 
     private boolean _isMyTurn() {
-        if (resigned != null)
-            return false;
-
-        return true;
+        return resigned == null;
     }
 
     @Override
@@ -106,7 +101,7 @@ public class GoControlSingle extends GoControl {
 
     @Override
     public synchronized boolean putStoneAt(int x, int y, boolean pass) {
-        Player next_turn = (current_turn == Player.WHITE)? Player.BLACK : Player.WHITE;
+        Player next_turn = (current_turn == Player.WHITE) ? Player.BLACK : Player.WHITE;
 
         if (this.calc_mode()) {
             rule.toggle_owner(x, y);
@@ -117,12 +112,12 @@ public class GoControlSingle extends GoControl {
             return true;
         }
         /* put stone according to specified RULE */
-        if (rule.putStoneAt(x, y, current_turn, next_turn, board_size) == false)
+        if (!rule.putStoneAt(x, y, current_turn, next_turn, board_size))
             return false;
 
         pass_count = 0;
 
-	    current_turn = next_turn;
+        current_turn = next_turn;
 
         if (callback_receiver != null) {
             callback_receiver.put_stone_success();
@@ -132,10 +127,9 @@ public class GoControlSingle extends GoControl {
         return true;
     }
 
-    private String get_sgf_for_added_stones()
-    {
-        String ab = "";
-        String aw = "";
+    private String get_sgf_for_added_stones() {
+        StringBuilder ab = new StringBuilder();
+        StringBuilder aw = new StringBuilder();
         /* get first board state */
         ArrayList<NewBoardState> time_line = rule.get_time_line();
         NewBoardState state = time_line.get(0);
@@ -145,38 +139,37 @@ public class GoControlSingle extends GoControl {
             switch (action.player) {
                 case BLACK:
                     if (ab.length() < 1)
-                        ab = "AB";
+                        ab = new StringBuilder("AB");
 
-                    ab += "[";
-                    ab += (char)(action.where.x + (int)('a'));
-                    ab += (char)(action.where.y + (int)('a'));
-                    ab += "]";
+                    ab.append("[");
+                    ab.append((char) (action.where.x + (int) ('a')));
+                    ab.append((char) (action.where.y + (int) ('a')));
+                    ab.append("]");
                     break;
 
                 case WHITE:
                     if (aw.length() < 1)
-                        aw = "AW";
+                        aw = new StringBuilder("AW");
 
-                    aw += "[";
-                    aw += (char)(action.where.x + (int)('a'));
-                    aw += (char)(action.where.y + (int)('a'));
-                    aw += "]";
+                    aw.append("[");
+                    aw.append((char) (action.where.x + (int) ('a')));
+                    aw.append((char) (action.where.y + (int) ('a')));
+                    aw.append("]");
                     break;
             }
         }
 
-        return ab + aw;
+        return ab + aw.toString();
     }
 
-    private String get_sgf_from_calc_info()
-    {
+    private String get_sgf_from_calc_info() {
         int i, x, y;
         ArrayList<GoRule.BoardPos> info = rule.get_calc_info();
 
-        String tw = "";
-        String tb = "";
+        StringBuilder tw = new StringBuilder();
+        StringBuilder tb = new StringBuilder();
 
-        for (i = 0 ; i < info.size() ; i++) {
+        for (i = 0; i < info.size(); i++) {
             GoRule.BoardPos cinfo = info.get(i);
 
             switch (cinfo.state) {
@@ -193,12 +186,12 @@ public class GoControlSingle extends GoControl {
                     y = i / board_size;
 
                     if (tb.length() < 1)
-                        tb = "TB";
+                        tb = new StringBuilder("TB");
 
-                    tb += "[";
-                    tb += (char)(x + (int)('a'));
-                    tb += (char)(y + (int)('a'));
-                    tb += "]";
+                    tb.append("[");
+                    tb.append((char) (x + (int) ('a')));
+                    tb.append((char) (y + (int) ('a')));
+                    tb.append("]");
                     break;
 
                 case BLACK_DEAD:
@@ -208,17 +201,17 @@ public class GoControlSingle extends GoControl {
                     y = i / board_size;
 
                     if (tw.length() < 1)
-                        tw = "TW";
+                        tw = new StringBuilder("TW");
 
-                    tw += "[";
-                    tw += (char)(x + (int)('a'));
-                    tw += (char)(y + (int)('a'));
-                    tw += "]";
+                    tw.append("[");
+                    tw.append((char) (x + (int) ('a')));
+                    tw.append((char) (y + (int) ('a')));
+                    tw.append("]");
                     break;
             }
         }
 
-        return tw + tb;
+        return tw.toString() + tb;
     }
 
     @Override
@@ -232,7 +225,7 @@ public class GoControlSingle extends GoControl {
 
         if (resigned != null) {
             sgf_string += "RE[";
-            sgf_string += (resigned == Player.BLACK)? "W+R" : "B+R";
+            sgf_string += (resigned == Player.BLACK) ? "W+R" : "B+R";
             sgf_string += "]";
         } else if (calc_mode()) {
             GoInfo info = get_info();
@@ -243,8 +236,8 @@ public class GoControlSingle extends GoControl {
                 sgf_string += "Draw";
             } else {
                 sgf_string += String.format("%c+%.1f",
-                    (info.score_diff > 0) ? 'W' : 'B',
-                    Math.abs(info.score_diff));
+                        (info.score_diff > 0) ? 'W' : 'B',
+                        Math.abs(info.score_diff));
             }
             sgf_string += "]";
         }
@@ -253,7 +246,7 @@ public class GoControlSingle extends GoControl {
 
         sgf_string += get_sgf_for_added_stones() + "\n\n";
 
-        for (i = 0 ; i < actions.size() ; i++) {
+        for (i = 0; i < actions.size(); i++) {
             sgf_string += actions.get(i).get_sgf_string() + "\n";
         }
 
@@ -295,8 +288,7 @@ public class GoControlSingle extends GoControl {
         for (SgfParser.ParsedItem item : result) {
             switch (item.type) {
                 case BOARD_SIZE:
-                    Integer size = (Integer) item.content;
-                    this.board_size = size;
+                    this.board_size = (Integer) item.content;
                     break;
 
                 case RULE:
@@ -315,8 +307,7 @@ public class GoControlSingle extends GoControl {
 
         /* Add default stones */
         if (white_added.size() > 0) {
-            if (state == null)
-                state = new NewBoardState(this.board_size);
+            state = new NewBoardState(this.board_size);
 
             for (GoAction each_action : white_added)
                 state.put_stone(each_action);
@@ -358,14 +349,6 @@ public class GoControlSingle extends GoControl {
         this.determined_result = null;
         for (SgfParser.ParsedItem item : result) {
             switch (item.type) {
-                /*
-                //We already processed board size.
-                case BOARD_SIZE:
-                    Integer size = (Integer) item.content;
-                    this.board_size = size;
-                    break;
-                    */
-
                 case KOMI:
                     this.komi = (Float) item.content;
                     break;
@@ -407,7 +390,8 @@ public class GoControlSingle extends GoControl {
                     break;
 
                 case RESULT:
-                    this.determined_result = (Object [])item.content;
+                    this.determined_result = (Object[]) item.content;
+                    break;
             }
         }
 
@@ -417,14 +401,15 @@ public class GoControlSingle extends GoControl {
             NewBoardState last = null;
             try {
                 last = (NewBoardState) time_line.get(time_line.size() - 1).clone();
-            } catch (CloneNotSupportedException e) {}
-
-            for(Point each_p : territory_black) {
-                last.mark_territory(each_p.x, each_p.y, 0);
+            } catch (CloneNotSupportedException e) {
             }
 
-            for(Point each_p : territory_white) {
-                last.mark_territory(each_p.x, each_p.y, 1);
+            for (Point each_p : territory_black) {
+                Objects.requireNonNull(last).mark_territory(each_p.x, each_p.y, 0);
+            }
+
+            for (Point each_p : territory_white) {
+                Objects.requireNonNull(last).mark_territory(each_p.x, each_p.y, 1);
             }
 
             time_line.add(last);
@@ -449,7 +434,7 @@ public class GoControlSingle extends GoControl {
             return false;
         }
 
-        Player next_turn = (current_turn == Player.WHITE)? Player.BLACK : Player.WHITE;
+        Player next_turn = (current_turn == Player.WHITE) ? Player.BLACK : Player.WHITE;
 
         current_turn = next_turn;
         rule.pass(next_turn);
@@ -468,8 +453,7 @@ public class GoControlSingle extends GoControl {
     }
 
     @Override
-    public synchronized boolean undo()
-    {
+    public synchronized boolean undo() {
         if (resigned != null) {
             resigned = null;
             this.callback_receiver.callback_board_state_changed();
@@ -487,9 +471,9 @@ public class GoControlSingle extends GoControl {
         GoAction last_action;
         last_action = history.get(history.size() - 1);
 
-	if (!this.rule.undo()) {
-	    return false;
-	}
+        if (!this.rule.undo()) {
+            return false;
+        }
 
         if (last_action.action == Action.PASS && pass_count > 0) {
             pass_count--;
@@ -498,7 +482,7 @@ public class GoControlSingle extends GoControl {
         current_turn = last_action.player;
 
         this.callback_receiver.callback_board_state_changed();
-        return  true;
+        return true;
     }
 
     @Override
@@ -555,18 +539,22 @@ public class GoControlSingle extends GoControl {
         this.callback_receiver.callback_board_state_changed();
     }
 
-    public boolean calc_mode()
-    {
-        if (pass_count >= MAX_PASS_COUNT)
-            return true;
+    public boolean calc_mode() {
+        return pass_count >= MAX_PASS_COUNT;
 
-        return false;
     }
 
     @Override
-    public Point get_cur_coord()
-    {
-        return null;
+    public Point get_cur_coord() {
+        ArrayList<GoAction> history = rule.get_action_history();
+        if (history.size() < 1 )
+            return null;
+
+        GoAction last_action;
+        last_action = history.get(history.size() - 1);
+
+        return last_action.where;
+
     }
 
     @Override
@@ -592,12 +580,11 @@ public class GoControlSingle extends GoControl {
         this.handicap = handicap;
     }
 
-    public String get_determined_result_string()
-    {
+    public String get_determined_result_string() {
         String result = null;
         String result_convert;
 
-	ResStrGenerator generator = ResStrGenerator.getInstance();
+        ResStrGenerator generator = ResStrGenerator.getInstance();
 
         if (this.determined_result == null)
             return "";
@@ -625,7 +612,7 @@ public class GoControlSingle extends GoControl {
             result_convert = generator.get_res_string(R.string.resign);
         }
 
-	result = String.format(result, result_convert);
+        result = String.format(result, result_convert);
 
         return result;
     }

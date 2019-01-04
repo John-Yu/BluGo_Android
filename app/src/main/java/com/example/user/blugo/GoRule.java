@@ -1,17 +1,7 @@
 package com.example.user.blugo;
 
-import android.graphics.Point;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
-
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by user on 2016-06-02.
@@ -29,12 +19,11 @@ public abstract class GoRule {
 
         private final int value;
 
-        private BoardPosState(int value) {
+        BoardPosState(int value) {
             this.value = value;
         }
 
-        public static BoardPosState valueOf(int type)
-        {
+        public static BoardPosState valueOf(int type) {
             /*
             Enumeration values must be sequential or else
             ArrayIndexoutofbound exeception may be thrown.
@@ -42,8 +31,7 @@ public abstract class GoRule {
             return (BoardPosState) BoardPosState.values()[type];
         }
 
-        public int getValue()
-        {
+        public int getValue() {
             return value;
         }
     }
@@ -54,12 +42,11 @@ public abstract class GoRule {
 
         private final int value;
 
-        private RuleID(int value) {
+        RuleID(int value) {
             this.value = value;
         }
 
-        public static RuleID valueOf(int type)
-        {
+        public static RuleID valueOf(int type) {
             /*
             Enumeration values must be sequential or else
             ArrayIndexoutofbound exeception may be thrown.
@@ -67,13 +54,11 @@ public abstract class GoRule {
             return (RuleID) RuleID.values()[type];
         }
 
-        public int getValue()
-        {
+        public int getValue() {
             return value;
         }
 
-        public String get_sgf_string()
-        {
+        public String get_sgf_string() {
             String sgf = "RU[";
 
             switch (valueOf(value)) {
@@ -96,8 +81,7 @@ public abstract class GoRule {
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             String result;
 
             switch (valueOf(value)) {
@@ -134,19 +118,29 @@ public abstract class GoRule {
 
 
     public abstract HashSet<GoControl.GoAction> get_stones();
+
     public abstract ArrayList<BoardPos> get_calc_info();
+
     public abstract ArrayList<NewBoardState> get_time_line();
 
     public abstract ArrayList<GoControl.GoAction> get_action_history();
+
     /*public abstract ArrayList<BoardState> getTimeline();*/
     public abstract boolean putStoneAt(int x, int y, GoControl.Player stone_color, GoControl.Player next_turn, int board_size);
+
     public abstract void toggle_owner(int x, int y);
+
     public abstract void pass(GoControl.Player next_turn);
+
     public abstract boolean undo();
+
     public abstract void cancel_calc();
+
     public abstract void prepare_calc();
+
     public abstract RuleID get_rule_id();
 
     public abstract void get_dead(GoControl.GoInfo info);
+
     public abstract void get_score(GoControl.GoInfo info);
 }

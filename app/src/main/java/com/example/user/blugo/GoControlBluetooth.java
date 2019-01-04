@@ -7,28 +7,27 @@ import java.util.ArrayList;
 /**
  * Created by user on 2016-06-08.
  */
-public class GoControlBluetooth extends GoControlSingle{
-    private  Player my_turn;
+public class GoControlBluetooth extends GoControlSingle {
+    private Player my_turn;
     private boolean game_finished = false;
     private boolean confirm_check = false;
     private boolean undo_waiting = false;
 
     GoControlBluetooth(Player my_turn) {
-	this(19, 6.5f, 0, new GoRuleJapan(19), my_turn, Player.BLACK);
+        this(19, 6.5f, 0, new GoRuleJapan(19), my_turn, Player.BLACK);
     }
 
     GoControlBluetooth(int board_size, float komi, int handicap, GoRule rule, Player my_turn,
                        Player start_turn) {
         super(board_size, start_turn, rule);
 
-	this.komi = komi;
+        this.komi = komi;
         this.my_turn = my_turn;
     }
 
-    private boolean _isMyTurn()
-    {
+    private boolean _isMyTurn() {
         if (game_finished)
-            return  false;
+            return false;
 
         if (confirm_check)
             return false;
@@ -39,7 +38,7 @@ public class GoControlBluetooth extends GoControlSingle{
         BlutoothCommThread comm = BlutoothCommThread.getInstance();
 
         if (comm == null)
-            return  false;
+            return false;
 
         if (calc_mode())
             return true;
@@ -47,8 +46,7 @@ public class GoControlBluetooth extends GoControlSingle{
         return this.current_turn == my_turn;
     }
 
-    public Player get_my_color()
-    {
+    public Player get_my_color() {
         return my_turn;
     }
 
@@ -66,8 +64,8 @@ public class GoControlBluetooth extends GoControlSingle{
 
         if (success) {
             comm.write(BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.PUTSTONE,
-                new Point(x, y)
-                ));
+                    new Point(x, y)
+            ));
         }
 
         return success;
@@ -90,7 +88,7 @@ public class GoControlBluetooth extends GoControlSingle{
 
         comm = BlutoothCommThread.getInstance();
         comm.write(BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.PASS,
-            null
+                null
         ));
 
         return true;
@@ -120,7 +118,7 @@ public class GoControlBluetooth extends GoControlSingle{
         undo_waiting = true;
 
         comm.write(BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_UNDO,
-            null
+                null
         ));
 
         return true;
@@ -132,13 +130,13 @@ public class GoControlBluetooth extends GoControlSingle{
 
             if (i_requested) {
                 while (current_turn != my_turn) {
-                    if (super.undo() == false)
+                    if (!super.undo())
                         break;
                 }
                 /* now again current_turn == my_turn */
             } else {
                 while (current_turn == my_turn) {
-                    if (super.undo() == false)
+                    if (!super.undo())
                         break;
                 }
 
@@ -159,7 +157,7 @@ public class GoControlBluetooth extends GoControlSingle{
         this.resigned = my_turn;
 
         comm.write(BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.RESIGN,
-            null
+                null
         ));
     }
 
@@ -171,8 +169,7 @@ public class GoControlBluetooth extends GoControlSingle{
         }
     }
 
-    public void finish_game()
-    {
+    public void finish_game() {
         game_finished = true;
     }
 

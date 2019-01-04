@@ -20,43 +20,39 @@ public class BlutoothClientThread extends Thread {
 
     private static BlutoothClientThread instance;
 
-    private BlutoothClientThread()
-    {
-	mmSocket = null;
-	mmDevice = null;
-	mBluetoothAdapter = null;
-	listener = null;
+    private BlutoothClientThread() {
+        mmSocket = null;
+        mmDevice = null;
+        mBluetoothAdapter = null;
+        listener = null;
     }
 
-    private BlutoothClientThread(BluetoothAdapter adapter, BluetoothDevice device, GoMessageListener listener)
-    {
+    private BlutoothClientThread(BluetoothAdapter adapter, BluetoothDevice device, GoMessageListener listener) {
         BluetoothSocket tmp = null;
         mmDevice = device;
 
         try {
             tmp = device.createRfcommSocketToServiceRecord(BlutoothServerThread.uuid);
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
         mmSocket = tmp;
-        this. mBluetoothAdapter = adapter;
+        this.mBluetoothAdapter = adapter;
         this.listener = listener;
     }
 
-    public static BlutoothClientThread getInstance()
-    {
-	return instance;
+    public static BlutoothClientThread getInstance() {
+        return instance;
     }
 
-    public static BlutoothClientThread getInstance(BluetoothAdapter adapter, BluetoothDevice device, GoMessageListener listener)
-    {
-	if (instance == null) {
-	    instance = new BlutoothClientThread(adapter, device, listener);
-	}
+    public static BlutoothClientThread getInstance(BluetoothAdapter adapter, BluetoothDevice device, GoMessageListener listener) {
+        if (instance == null) {
+            instance = new BlutoothClientThread(adapter, device, listener);
+        }
 
-	return instance;
+        return instance;
     }
 
-    public void run()
-    {
+    public void run() {
         Handler h;
         Message msg;
 
@@ -66,9 +62,9 @@ public class BlutoothClientThread extends Thread {
         try {
             mmSocket.connect();
         } catch (IOException connectException) {
-            this.instance = null;
+            instance = null;
             msg = Message.obtain(h, GoMessageListener.BLUTOOTH_CLIENT_SOCKET_ERROR,
-                connectException.toString());
+                    connectException.toString());
             h.sendMessage(msg);
             cancel();
             return;
@@ -79,13 +75,13 @@ public class BlutoothClientThread extends Thread {
         connected_thread.start();
         try {
             msg = Message.obtain(h, GoMessageListener.BLUTOOTH_CLIENT_CONNECT_SUCCESS,
-                "connection success");
+                    "connection success");
             h.sendMessage(msg);
             connected_thread.join();
-        } catch(InterruptedException e) {
-            this.instance = null;
+        } catch (InterruptedException e) {
+            instance = null;
             msg = Message.obtain(h, GoMessageListener.BLUTOOTH_CLIENT_SOCKET_ERROR,
-                e.toString());
+                    e.toString());
             h.sendMessage(msg);
         }
         connected_thread = null;
@@ -93,10 +89,10 @@ public class BlutoothClientThread extends Thread {
         cancel();
     }
 
-    public synchronized void cancel()
-    {
+    public synchronized void cancel() {
         try {
             mmSocket.close();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
 }

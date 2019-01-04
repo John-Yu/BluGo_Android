@@ -1,5 +1,5 @@
  # BluGo Interface
-![screenshot](/app/misc/device_en_2.png?raw=true)
+![screenshot](/app/misc/device_en_2.png)
 
  # Introduction
 **BluGo** is a free open-source Android GO board game program.  

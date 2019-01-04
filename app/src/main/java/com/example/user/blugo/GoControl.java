@@ -51,8 +51,7 @@ public abstract class GoControl {
             this.group_id = group_id;
         }
 
-        public String get_sgf_string()
-        {
+        public String get_sgf_string() {
             String string = ";";
             switch (player) {
                 case WHITE:
@@ -68,8 +67,8 @@ public abstract class GoControl {
             if (action == Action.PUT && where != null) {
                 /* a - z : 0 ~ 24 */
                 /* A - Z : 25 ~ 49 */
-                string += (char)(where.x + (int)('a'));
-                string += (char)(where.y + (int)('a'));
+                string += (char) (where.x + (int) ('a'));
+                string += (char) (where.y + (int) ('a'));
             }
 
             string += "]";
@@ -81,7 +80,7 @@ public abstract class GoControl {
         protected Object clone() throws CloneNotSupportedException {
             Point p;
             if (where == null)
-                p = where;
+                p = null;
             else
                 p = new Point(where.x, where.y);
 
@@ -119,12 +118,12 @@ public abstract class GoControl {
     }
 
     public interface Callback {
-        public void callback_board_state_changed();
-        public void put_stone_success();
+        void callback_board_state_changed();
+
+        void put_stone_success();
     }
 
-    public static class GoInfo
-    {
+    public static class GoInfo {
         public int white_dead = 0;
         public int black_dead = 0;
 
@@ -147,19 +146,31 @@ public abstract class GoControl {
     }
 
     public abstract boolean isMyTurn();
+
     public abstract HashSet<GoAction> getStone_pos();
+
     public abstract int getBoardSize();
+
     public abstract Player getCurrent_turn();
+
     public abstract boolean putStoneAt(int x, int y, boolean pass);
+
     public abstract String get_sgf();
+
     public abstract boolean load_sgf(String text);
+
     public abstract boolean calc_mode();
+
     public abstract ArrayList<GoRule.BoardPos> get_calc_info();
+
     public abstract Point get_cur_coord();
 
     public abstract boolean pass();
+
     public abstract boolean undo();
+
     public abstract void resign();
+
     public abstract Player is_resigned();
 
     public abstract GoInfo get_info();

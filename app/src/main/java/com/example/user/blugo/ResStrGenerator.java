@@ -8,23 +8,18 @@ import android.content.Context;
 public class ResStrGenerator {
     private static ResStrGenerator instance;
 
-    private Context app_context;
+    private ResStrGenerator() {
 
-    private ResStrGenerator()
-    {
-        app_context = App.getAppContext();
     }
 
-    public static synchronized ResStrGenerator getInstance()
-    {
+    public static synchronized ResStrGenerator getInstance() {
         if (instance == null) {
             instance = new ResStrGenerator();
         }
         return instance;
     }
 
-    public String get_res_string(int resId)
-    {
-        return app_context.getString(resId);
+    public String get_res_string(int resId) {
+        return App.getAppContext().getString(resId);
     }
 }

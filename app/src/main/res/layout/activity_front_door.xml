@@ -35,8 +35,6 @@
             android:text="@string/review_game"
             android:id="@+id/button10"
             android:onClick="load_SGF"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"/>
 
         <Button
@@ -45,8 +43,6 @@
             android:text="@string/single_game"
             android:id="@+id/button7"
             android:onClick="start_single_game"
-            android:layout_below="@+id/button10"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"/>
 
         <Button
@@ -54,8 +50,6 @@
             android:layout_height="wrap_content"
             android:text="@string/enable_discover"
             android:id="@+id/button16"
-            android:layout_below="@+id/button8"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:onClick="enable_discover"/>
 
@@ -65,8 +59,6 @@
             android:text="@string/wait_game_request"
             android:id="@+id/button8"
             android:onClick="wait_game_request"
-            android:layout_below="@+id/button7"
-            android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"/>
 
         <Button
@@ -75,9 +67,6 @@
             android:text="@string/request_game"
             android:id="@+id/button9"
             android:onClick="request_play"
-            android:layout_below="@+id/button16"
-            android:layout_alignRight="@+id/button10"
-            android:layout_alignEnd="@+id/button10"
             android:layout_gravity="center_horizontal"/>
 
     </LinearLayout>

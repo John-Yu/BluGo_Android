@@ -30,6 +30,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class FrontDoorActivity extends AppCompatActivity implements FileChooser.FileSelectedListener,
@@ -63,14 +64,9 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         Toolbar my_tool_bar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(my_tool_bar);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_Light_Dialog);
-            dialog_rq_confirm = new Dialog(this,
-                    android.R.style.Theme_DeviceDefault_Light_Dialog);
-        } else {
-            dialog = new Dialog(this);
-            dialog_rq_confirm = new Dialog(this);
-        }
+        dialog = new Dialog(this, android.R.style.Theme_DeviceDefault_Light_Dialog);
+        dialog_rq_confirm = new Dialog(this,
+                android.R.style.Theme_DeviceDefault_Light_Dialog);
 
         connection_established = false;
     }
@@ -125,30 +121,30 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
 
         AlertDialog alert;
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.new_single_game, null);
+        View layout = Objects.requireNonNull(inflater).inflate(R.layout.new_single_game, null);
 
         komi = (TextView) layout.findViewById(R.id.num_komi);
         komi.setText("6.5");
 
         /* rule */
         sp_rule = (Spinner) layout.findViewById(R.id.sp_rule);
-        List<String> rules = new ArrayList<String>();
+        List<String> rules = new ArrayList<>();
         rules.add(getString(R.string.rule_japanese).toUpperCase());
         rules.add(getString(R.string.rule_chinese).toUpperCase());
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rules);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, rules);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_rule.setAdapter(adapter);
         sp_rule.setOnItemSelectedListener(this);
 
         /* size : 19, 17, 15, 13, 11, 9, 7, 5, 3 */
         sp_board_size = (Spinner) layout.findViewById(R.id.sp_board_size);
-        List<Integer> bd_size = new ArrayList<Integer>();
+        List<Integer> bd_size = new ArrayList<>();
 
         for (int i = 19; i >= 3; i -= 2) {
             bd_size.add(i);
         }
 
-        ArrayAdapter<Integer> bd_size_adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, bd_size);
+        ArrayAdapter<Integer> bd_size_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, bd_size);
         bd_size_adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_board_size.setAdapter(bd_size_adapter);
         sp_board_size.setOnItemSelectedListener(this);
@@ -163,7 +159,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         handicap.add(13);
         handicap.add(16);
         handicap.add(25);
-        ArrayAdapter<Integer> handicap_adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, handicap);
+        ArrayAdapter<Integer> handicap_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, handicap);
         bd_size_adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_handicap.setAdapter(handicap_adapter);
         sp_handicap.setOnItemSelectedListener(this);
@@ -173,31 +169,28 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         builder
                 .setView(layout)
                 .setTitle(getString(R.string.game_setting))
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Message msg;
-                        GoPlaySetting setting = new GoPlaySetting();
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    Message msg;
+                    GoPlaySetting setting = new GoPlaySetting();
 
-                        setting.handicap = (Integer) sp_handicap.getSelectedItem();
-                        setting.size = (Integer) sp_board_size.getSelectedItem();
-                        setting.rule = sp_rule.getSelectedItemPosition();
-                        try {
-                            setting.komi = Float.parseFloat(komi.getText().toString());
-                        } catch (NumberFormatException e) {
-                            Log.d("EXP", "'" + komi.getText().toString() + "'" +
-                                    " cannot be converted to float");
-                            setting.komi = (setting.rule == 0) ? 6.5f : 7.5f;
-                        }
-
-                        if (setting.handicap > 0 && setting.size < 19) {
-                            setting.handicap = 0;
-                        }
-
-                        msg = Message.obtain(FrontDoorActivity.this.msg_handler,
-                                SINGLE_GAME_SETTING_FINISHED, setting);
-                        FrontDoorActivity.this.msg_handler.sendMessage(msg);
+                    setting.handicap = (Integer) sp_handicap.getSelectedItem();
+                    setting.size = (Integer) sp_board_size.getSelectedItem();
+                    setting.rule = sp_rule.getSelectedItemPosition();
+                    try {
+                        setting.komi = Float.parseFloat(komi.getText().toString());
+                    } catch (NumberFormatException e) {
+                        Log.d("EXP", "'" + komi.getText().toString() + "'" +
+                                " cannot be converted to float");
+                        setting.komi = (setting.rule == 0) ? 6.5f : 7.5f;
                     }
+
+                    if (setting.handicap > 0 && setting.size < 19) {
+                        setting.handicap = 0;
+                    }
+
+                    msg = Message.obtain(FrontDoorActivity.this.msg_handler,
+                            SINGLE_GAME_SETTING_FINISHED, setting);
+                    FrontDoorActivity.this.msg_handler.sendMessage(msg);
                 })
                 .setNegativeButton(android.R.string.cancel, null);
 
@@ -224,11 +217,11 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
     }
 
     public void wait_game_request(View view) {
-        if (enableBluetooth() == false)
+        if (!enableBluetooth())
             return;
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View layout = inflater.inflate(R.layout.wait_dialog, null);
+        View layout = Objects.requireNonNull(inflater).inflate(R.layout.wait_dialog, null);
 
         TextView t = (TextView) layout.findViewById(R.id.text_b_addr);
 
@@ -265,7 +258,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
     }
 
     public void request_play(View view) {
-        if (enableBluetooth() == false)
+        if (!enableBluetooth())
             return;
 
         Intent intent = new Intent(this, PlayRequestActivity.class);
@@ -318,7 +311,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                 Log.d("SERVER", "REQUEST_PLAY RECEIVED");
                 server = BlutoothServerThread.getInstance();
                 m = BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_PLAY_ACK,
-                        new Integer(my_color == 0 ? 1 : 0));
+                        my_color == 0 ? 1 : 0);
                 server.get_connected().write(m);
 
                 setting.wb = my_color;
@@ -405,50 +398,44 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                     tmp.setText(getString(R.string.black));
                 }
 
-                accept_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Message msg = Message.obtain(msg_handler,
-                                GoMessageListener.BLUTOOTH_COMM_ACCEPTED_REQUEST,
-                                "connection success");
-                        msg_handler.sendMessage(msg);
-                        dialog_rq_confirm.dismiss();
-                    }
+                accept_button.setOnClickListener(v -> {
+                    Message msg1 = Message.obtain(msg_handler,
+                            GoMessageListener.BLUTOOTH_COMM_ACCEPTED_REQUEST,
+                            "connection success");
+                    msg_handler.sendMessage(msg1);
+                    dialog_rq_confirm.dismiss();
                 });
 
-                reject_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        BlutoothServerThread server = BlutoothServerThread.getInstance();
-                        String m;
-                        m = BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_PLAY_ACK,
-                                -1);
-                        server.get_connected().write(m);
+                reject_button.setOnClickListener(v -> {
+                    BlutoothServerThread server1 = BlutoothServerThread.getInstance();
+                    String m;
+                    m = BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_PLAY_ACK,
+                            -1);
+                    server1.get_connected().write(m);
 
-                        BlutoothClientThread client;
+                    BlutoothClientThread client;
 
-                        /* stop communicator */
-                        BlutoothCommThread comm;
-                        comm = BlutoothCommThread.getInstance();
-                        if (comm != null) {
-                            comm.cancel();
-                            try {
-                                comm.join();
-                            } catch (InterruptedException e) {
-                            }
+                    /* stop communicator */
+                    BlutoothCommThread comm;
+                    comm = BlutoothCommThread.getInstance();
+                    if (comm != null) {
+                        comm.cancel();
+                        try {
+                            comm.join();
+                        } catch (InterruptedException e) {
                         }
-
-                        /* stop server */
-                        server = BlutoothServerThread.getInstance();
-                        if (server != null) {
-                            server.cancel();
-                            try {
-                                server.join();
-                            } catch (InterruptedException e) {
-                            }
-                        }
-                        dialog_rq_confirm.dismiss();
                     }
+
+                    /* stop server */
+                    server1 = BlutoothServerThread.getInstance();
+                    if (server1 != null) {
+                        server1.cancel();
+                        try {
+                            server1.join();
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                    dialog_rq_confirm.dismiss();
                 });
 
                 dialog_rq_confirm.show();

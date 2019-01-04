@@ -13,8 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Objects;
 
 public class GoBoardActivity extends AppCompatActivity implements FileChooser.FileSelectedListener, GoBoardViewListener {
     private GoBoardView gv;
@@ -29,9 +31,9 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
 
     private String get_info_text() {
         String str, result;
-        GoControl.GoInfo info =  single_game.get_info();
+        GoControl.GoInfo info = single_game.get_info();
 
-        GoControl.Player resigned = null;
+        GoControl.Player resigned;
 
         resigned = single_game.is_resigned();
 
@@ -48,26 +50,26 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                 result = getString(R.string.draw);
             } else if (info.score_diff > 0) {
                 result = String.format(getString(R.string.white_short) + "+%.1f",
-				       info.score_diff);
+                        info.score_diff);
             } else {
                 result = String.format(getString(R.string.black_short) + "+%.1f",
-				       Math.abs(info.score_diff));
+                        Math.abs(info.score_diff));
             }
 
             str = String.format(getString(R.string.white_tr_short) +
-				": %.1f, " +
-				getString(R.string.black_tr_short) +
-				": %.1f, %s",
-				info.white_final, info.black_final, result);
+                            ": %.1f, " +
+                            getString(R.string.black_tr_short) +
+                            ": %.1f, %s",
+                    info.white_final, info.black_final, result);
         } else {
             str = String.format("%s(%d), %s: %d, %s: %d",
-                info.turn == GoControl.Player.WHITE?
-				getString(R.string.white_short) : getString(R.string.black_short),
-				info.turn_num,
-				getString(R.string.dead_white_short),
-				info.white_dead,
-				getString(R.string.dead_black_short),
-				info.black_dead);
+                    info.turn == GoControl.Player.WHITE ?
+                            getString(R.string.white_short) : getString(R.string.black_short),
+                    info.turn_num,
+                    getString(R.string.dead_white_short),
+                    info.white_dead,
+                    getString(R.string.dead_black_short),
+                    info.black_dead);
         }
 
         return str;
@@ -95,7 +97,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
             int bw = bundle.getInt(ReviewGameActivity.MSG_CURRENT_TURN);
             int start_turn = bundle.getInt(ReviewGameActivity.MSG_START_TURNNO);
 
-            switch (GoRule.RuleID.valueOf(setting.rule)) {
+            switch (GoRule.RuleID.valueOf(Objects.requireNonNull(setting).rule)) {
                 case JAPANESE:
                     rule = new GoRuleJapan(state);
                     break;
@@ -115,9 +117,9 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                 rule, start_turn);
                 */
 
-            single_game = new GoControlSingle(state.size,
-                bw == 0? GoControl.Player.BLACK : GoControl.Player.WHITE,
-            setting.komi, setting.handicap, rule, start_turn);
+            single_game = new GoControlSingle(Objects.requireNonNull(state).size,
+                    bw == 0 ? GoControl.Player.BLACK : GoControl.Player.WHITE,
+                    setting.komi, setting.handicap, rule, start_turn);
 
             /*
                 Because SGF format cannot save initial dead stone information.
@@ -157,22 +159,19 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         return super.onOptionsItemSelected(item);
     }
 
-    public void undo(View view)
-    {
+    public void undo(View view) {
         /* board clear */
         // single_game.new_game();
 
-	/* undo last move */
-	single_game.undo();
+        /* undo last move */
+        single_game.undo();
     }
 
-    public void pass(View view)
-    {
+    public void pass(View view) {
         single_game.pass();
     }
 
-    public void load_SGF(View view)
-    {
+    public void load_SGF(View view) {
         FileChooser f = new FileChooser(this);
 
         f.setExtension("sgf");
@@ -180,8 +179,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         f.showDialog();
     }
 
-    public void save_SGF(View view)
-    {
+    public void save_SGF(View view) {
         GoActivityUtil.getInstance().save_sgf(this, single_game);
     }
 
@@ -198,11 +196,11 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         Log.d("TEST", "selected file : " + file.toString());
 
         FileInputStream is;
-        byte [] buffer = new byte[512];
+        byte[] buffer = new byte[512];
         int read;
         String tmp;
 
-        sgf_string = new String();
+        sgf_string = "";
 
         try {
             is = new FileInputStream(file.getPath());
@@ -221,20 +219,17 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
             e.printStackTrace();
         }
 
-        new Thread(new Runnable() {
-            public void run() {
-                single_game.load_sgf(sgf_string);
-                Message msg;
-                msg = Message.obtain(GoBoardActivity.this.msg_handler, GoMessageListener.MSG_LOAD_END, "msg");
-                GoBoardActivity.this.msg_handler.sendMessage(msg);
-            }
+        new Thread(() -> {
+            single_game.load_sgf(sgf_string);
+            Message msg;
+            msg = Message.obtain(GoBoardActivity.this.msg_handler, GoMessageListener.MSG_LOAD_END, "msg");
+            GoBoardActivity.this.msg_handler.sendMessage(msg);
         }).start();
 
 
     }
 
-    private class GoMsgHandler implements Handler.Callback
-    {
+    private class GoMsgHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
             String tmp;
@@ -243,15 +238,13 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                     gv.invalidate();
                     txt_info.setText(get_info_text());
                     progressBar.setVisibility(View.GONE);
-                    ;
                     return true;
             }
             return false;
         }
     }
 
-    private class ViewMessageHandler implements Handler.Callback
-    {
+    private class ViewMessageHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
             String tmp;
@@ -269,8 +262,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         return this.view_msg_handler;
     }
 
-    public void resign(View view)
-    {
+    public void resign(View view) {
         single_game.resign();
         txt_info.setText(get_info_text());
     }

@@ -19,8 +19,8 @@ public interface GoMessageListener {
     int MSG_LOAD_FAIL = 12;
     int MSG_LOAD_BEGIN = 13;
 
-    public final static String GAME_SETTING_MESSAGE =
-        "com.example.user.blugo.GoMessageListener.GAME_SETTING_MESSAGE";
+    String GAME_SETTING_MESSAGE =
+            "com.example.user.blugo.GoMessageListener.GAME_SETTING_MESSAGE";
 
     Handler get_go_msg_handler();
 }

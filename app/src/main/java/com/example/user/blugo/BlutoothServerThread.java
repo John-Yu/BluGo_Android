@@ -3,8 +3,8 @@ package com.example.user.blugo;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.os.Message;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class BlutoothServerThread extends Thread {
     private static BlutoothServerThread instance = null;
 
     private BlutoothServerThread() {
-	mmServerSocket = null;
+        mmServerSocket = null;
     }
 
     private BlutoothServerThread(BluetoothAdapter adapter, GoMessageListener listener) {
@@ -37,56 +37,53 @@ public class BlutoothServerThread extends Thread {
         this.listener = listener;
     }
 
-    public static BlutoothServerThread getInstance(BluetoothAdapter adapter, GoMessageListener listener)
-    {
-	if (instance == null) {
-	    instance = new BlutoothServerThread(adapter, listener);
-	}
-	return instance;
+    public static BlutoothServerThread getInstance(BluetoothAdapter adapter, GoMessageListener listener) {
+        if (instance == null) {
+            instance = new BlutoothServerThread(adapter, listener);
+        }
+        return instance;
     }
 
-    public static BlutoothServerThread getInstance()
-    {
-	return instance;
+    public static BlutoothServerThread getInstance() {
+        return instance;
     }
 
 
-    public BlutoothCommThread get_connected()
-    {
+    public BlutoothCommThread get_connected() {
         return this.connected_thread;
     }
 
     public void run() {
-	try {
-	    socket = mmServerSocket.accept();
-	} catch (IOException e) {
-	    Message msg;
+        try {
+            socket = mmServerSocket.accept();
+        } catch (IOException e) {
+            Message msg;
 
-	    Log.d("MYTAG", e.toString());
+            Log.d("MYTAG", e.toString());
 
             instance = null;
 
-	    Handler h = listener.get_go_msg_handler();
-	    msg = Message.obtain(h, GoMessageListener.BLUTOOTH_SERVER_SOCKET_ERROR,
-				 e.toString());
+            Handler h = listener.get_go_msg_handler();
+            msg = Message.obtain(h, GoMessageListener.BLUTOOTH_SERVER_SOCKET_ERROR,
+                    e.toString());
             h.sendMessage(msg);
             cancel();
 
-	    return;
-	}
+            return;
+        }
 
-	if (socket != null) {
-	    connected_thread = BlutoothCommThread.getInstance(socket, this.listener);
-	    connected_thread.start();
-	    try {
-		connected_thread.join();
-	    } catch(InterruptedException e) {
-		Log.d("MYTAG", e.toString());
-	    }
-	    connected_thread = null;
-	}
+        if (socket != null) {
+            connected_thread = BlutoothCommThread.getInstance(socket, this.listener);
+            connected_thread.start();
+            try {
+                connected_thread.join();
+            } catch (InterruptedException e) {
+                Log.d("MYTAG", e.toString());
+            }
+            connected_thread = null;
+        }
 
-	instance = null;
+        instance = null;
         cancel();
     }
 

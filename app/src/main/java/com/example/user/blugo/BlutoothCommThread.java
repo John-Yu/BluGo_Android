@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -28,8 +27,7 @@ public class BlutoothCommThread extends Thread {
 
     }
 
-    private BlutoothCommThread(BluetoothSocket socket, GoMessageListener listener)
-    {
+    private BlutoothCommThread(BluetoothSocket socket, GoMessageListener listener) {
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
 
@@ -38,38 +36,36 @@ public class BlutoothCommThread extends Thread {
         try {
             tmpIn = socket.getInputStream();
             tmpOut = socket.getOutputStream();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
 
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
         this.listener = listener;
     }
 
-    public static BlutoothCommThread getInstance(BluetoothSocket socket, GoMessageListener listener)
-    {
+    public static BlutoothCommThread getInstance(BluetoothSocket socket, GoMessageListener listener) {
         if (instance == null) {
             instance = new BlutoothCommThread(socket, listener);
         }
 
-        return  instance;
-    }
-
-    public static BlutoothCommThread getInstance()
-    {
         return instance;
     }
 
-    public void changeListener(GoMessageListener listener)
-    {
+    public static BlutoothCommThread getInstance() {
+        return instance;
+    }
+
+    public void changeListener(GoMessageListener listener) {
         try {
             mutex.acquire();
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
         this.listener = listener;
         mutex.release();
     }
 
-    public void run()
-    {
+    public void run() {
         byte[] buffer = new byte[1024];
         int bytes;
         String message = null;
@@ -87,28 +83,30 @@ public class BlutoothCommThread extends Thread {
 
                 try {
                     mutex.acquire();
-                } catch (InterruptedException e) {}
+                } catch (InterruptedException e) {
+                }
                 if (listener != null) {
                     h = listener.get_go_msg_handler();
                     msg = Message.obtain();
                     msg.what = GoMessageListener.BLUTOOTH_COMM_MSG;
                     msg.obj = parser.parse(message);
-                     h.sendMessage(msg);
+                    h.sendMessage(msg);
                 }
                 mutex.release();
 
-            } catch(IOException e) {
+            } catch (IOException e) {
                 Log.d("MYTAG", e.toString());
 
-                this.instance = null;
+                instance = null;
 
                 try {
                     mutex.acquire();
-                } catch (InterruptedException ie) {}
+                } catch (InterruptedException ie) {
+                }
                 if (listener != null) {
                     h = listener.get_go_msg_handler();
                     msg = Message.obtain(h, GoMessageListener.BLUTOOTH_COMM_ERROR,
-                        e.toString());
+                            e.toString());
                     h.sendMessage(msg);
                     cancel();
                     break;
@@ -117,7 +115,7 @@ public class BlutoothCommThread extends Thread {
             }
         }
 
-        this.instance = null;
+        instance = null;
     }
 
     public void write(String message) {
@@ -126,19 +124,21 @@ public class BlutoothCommThread extends Thread {
 
         try {
             this.write(message.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {}
+        } catch (UnsupportedEncodingException e) {
+        }
     }
 
     private void write(byte[] bytes) {
         try {
             mmOutStream.write(bytes);
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
 
-    public synchronized void cancel()
-    {
+    public synchronized void cancel() {
         try {
             mmSocket.close();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+        }
     }
 }

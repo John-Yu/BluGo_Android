@@ -50,11 +50,8 @@ public class GoControlReview extends GoControlSingle {
         int diff = rule.get_time_line().size() - rule.get_action_history().size();
         int last_pos = rule.get_time_line().size() - 1;
 
-        if (diff >= 2 && cur_pos >= last_pos) {
-            return true;
-        }
+        return diff >= 2 && cur_pos >= last_pos;
 
-        return false;
     }
 
     public int get_last_pos() {

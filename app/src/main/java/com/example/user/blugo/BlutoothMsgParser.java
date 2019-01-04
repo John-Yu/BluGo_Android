@@ -2,7 +2,6 @@ package com.example.user.blugo;
 
 import android.graphics.Point;
 
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,12 +26,11 @@ public class BlutoothMsgParser {
 
         private final int value;
 
-        private MsgType(int value) {
+        MsgType(int value) {
             this.value = value;
         }
 
-        public static MsgType valueOf(int type)
-        {
+        public static MsgType valueOf(int type) {
             /*
             Enumeration values must be sequential or else
             ArrayIndexoutofbound exeception may be thrown.
@@ -40,26 +38,25 @@ public class BlutoothMsgParser {
             return (MsgType) MsgType.values()[type];
         }
 
-        public int getValue()
-        {
+        public int getValue() {
             return value;
         }
     }
 
     private static String[] msg_type_string = {
-        "CHAT",
-        "RQ_PLAY",
-        "ACK_PLAY",
-        "PUTSTONE",
-        "PASS",
-        "RESIGN",
-        "RESULT_CONFIRM",
-        "DECLINE_RESULT",
-        "ACCEPT_RESULT",
-        "REQUEST_UNDO",
-        "ACCEPT_UNDO",
-        "DECLINE_UNDO",
-        "?????"
+            "CHAT",
+            "RQ_PLAY",
+            "ACK_PLAY",
+            "PUTSTONE",
+            "PASS",
+            "RESIGN",
+            "RESULT_CONFIRM",
+            "DECLINE_RESULT",
+            "ACCEPT_RESULT",
+            "REQUEST_UNDO",
+            "ACCEPT_UNDO",
+            "DECLINE_UNDO",
+            "?????"
     };
 
     public class MsgParsed {
@@ -71,10 +68,9 @@ public class BlutoothMsgParser {
     private final Pattern coord = Pattern.compile("(?m)([a-z])([a-z])");
     /*[RQ_PLAY]r=j,komi=6.5,size=19,wb=0,handicap=0*/
     private final Pattern gsetting =
-        Pattern.compile("(?m)r=([jc]),komi=([0-9.]+),size=(\\d+),wb=(\\d+),handicap=(\\d+)");
+            Pattern.compile("(?m)r=([jc]),komi=([0-9.]+),size=(\\d+),wb=(\\d+),handicap=(\\d+)");
 
-    private static String make_request_play_message(Object opt)
-    {
+    private static String make_request_play_message(Object opt) {
         /*
         Example message.
         [RQ_PLAY]r=j,komi=6.5,size=19,wb=0,handicap=0
@@ -85,13 +81,12 @@ public class BlutoothMsgParser {
 
         message += String.format("r=%c,", setting.rule == 0 ? 'j' : 'c');
         message += String.format("komi=%.1f,size=%d,wb=%d,handicap=%d",
-            setting.komi, setting.size, setting.wb, setting.handicap);
+                setting.komi, setting.size, setting.wb, setting.handicap);
 
         return message;
     }
 
-    public static String make_message(MsgType type, Object opt)
-    {
+    public static String make_message(MsgType type, Object opt) {
         String message;
         message = String.format("[%s]", msg_type_string[type.getValue()]);
 
@@ -116,8 +111,7 @@ public class BlutoothMsgParser {
         return message;
     }
 
-    private Object parse_putstone(String opt)
-    {
+    private Object parse_putstone(String opt) {
         Matcher m = coord.matcher(opt);
         String x, y;
         Point p;
@@ -139,8 +133,7 @@ public class BlutoothMsgParser {
         return p;
     }
 
-    private Object parse_request_play(String opt)
-    {
+    private Object parse_request_play(String opt) {
         Matcher m = gsetting.matcher(opt);
         GoPlaySetting setting = new GoPlaySetting();
         String tmp;
@@ -149,7 +142,7 @@ public class BlutoothMsgParser {
             return null;
 
         tmp = m.group(1);
-        setting.rule = tmp.charAt(0) == 'c'? 1 : 0;
+        setting.rule = tmp.charAt(0) == 'c' ? 1 : 0;
         setting.komi = Float.parseFloat(m.group(2));
         setting.size = Integer.parseInt(m.group(3));
         setting.wb = Integer.parseInt(m.group(4));
@@ -158,13 +151,11 @@ public class BlutoothMsgParser {
         return setting;
     }
 
-    private Object parse_request_play_ack(String opt)
-    {
+    private Object parse_request_play_ack(String opt) {
         return Integer.parseInt(opt);
     }
 
-    public MsgParsed parse(String message)
-    {
+    public MsgParsed parse(String message) {
         String cmd, opt;
         MsgType type;
         int i;
@@ -184,7 +175,7 @@ public class BlutoothMsgParser {
 
         type = MsgType.UNKNOWN;
 
-        for (i = 0 ; i < msg_type_string.length ; i++) {
+        for (i = 0; i < msg_type_string.length; i++) {
             if (cmd.equals(msg_type_string[i])) {
                 type = MsgType.values()[i];
                 break;

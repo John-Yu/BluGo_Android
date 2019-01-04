@@ -7,14 +7,14 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 
 import org.mozilla.universalchardet.UniversalDetector;
 
-import java.io.*;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Calendar;
 
 /**
@@ -22,7 +22,6 @@ import java.util.Calendar;
  */
 public class GoActivityUtil implements Handler.Callback, GoMessageListener {
     private static GoActivityUtil instance = null;
-    private ProgressBar load_progress = null;
 
     private Handler m_msg_handler = new Handler(this);
 
@@ -96,21 +95,18 @@ public class GoActivityUtil implements Handler.Callback, GoMessageListener {
         builder.setView(file_name_input)
                 .setTitle(ResStrGenerator.getInstance().get_res_string(R.string.input_save_file_name))
                 .setCancelable(false)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Message msg;
-                        SaveSGF_Msg save_sgf_msg = new SaveSGF_Msg();
-                        save_sgf_msg.file_name = file_name_input.getText().toString();
-                        save_sgf_msg.go_control = control;
-                        save_sgf_msg.context = context;
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    Message msg;
+                    SaveSGF_Msg save_sgf_msg = new SaveSGF_Msg();
+                    save_sgf_msg.file_name = file_name_input.getText().toString();
+                    save_sgf_msg.go_control = control;
+                    save_sgf_msg.context = context;
 
-                        msg = Message.obtain(GoActivityUtil.getInstance().get_go_msg_handler(),
-                                GoMessageListener.SAVE_FILE_NAME_INPUT_FINISHED,
-                                save_sgf_msg);
+                    msg = Message.obtain(GoActivityUtil.getInstance().get_go_msg_handler(),
+                            GoMessageListener.SAVE_FILE_NAME_INPUT_FINISHED,
+                            save_sgf_msg);
 
-                        GoActivityUtil.getInstance().get_go_msg_handler().sendMessage(msg);
-                    }
+                    GoActivityUtil.getInstance().get_go_msg_handler().sendMessage(msg);
                 })
                 .setNegativeButton(android.R.string.cancel, null);
 
@@ -122,13 +118,13 @@ public class GoActivityUtil implements Handler.Callback, GoMessageListener {
     public boolean handleMessage(Message msg) {
         switch (msg.what) {
             case GoMessageListener.SAVE_FILE_NAME_INPUT_FINISHED:
-                save_sgf_file_as((SaveSGF_Msg) msg.obj, true);
+                save_sgf_file_as((SaveSGF_Msg) msg.obj);
                 break;
         }
         return false;
     }
 
-    private void save_sgf_file_as(SaveSGF_Msg save_sgf_msg, boolean add_extension) {
+    private void save_sgf_file_as(SaveSGF_Msg save_sgf_msg) {
         String app_name;
         String sgf_text;
 
@@ -152,7 +148,7 @@ public class GoActivityUtil implements Handler.Callback, GoMessageListener {
 
         FileOutputStream os;
         try {
-            os = new FileOutputStream(path + save_sgf_msg.file_name + (add_extension ? ".sgf" : ""));
+            os = new FileOutputStream(path + save_sgf_msg.file_name + (true ? ".sgf" : ""));
             os.write(sgf_text.getBytes("UTF-8"));
             os.close();
         } catch (Exception e) {
@@ -161,49 +157,56 @@ public class GoActivityUtil implements Handler.Callback, GoMessageListener {
     }
 
     /* SGF Loading process */
-    public void load_sgf(Context ctx, final String sgf_path, final GoControl game, final Handler msg_handler) {
+    public void load_sgf(final String sgf_path, final GoControl game, final Handler msg_handler) {
 
-        new Thread(new Runnable() {
-            public void run() {
-                Message msg;
-                FileInputStream is;
-                String sgf_string = null;
-                boolean isOK = false;
-                msg = Message.obtain(msg_handler, MSG_LOAD_BEGIN, "msg");
-                msg_handler.sendMessage(msg);
+        new Thread(() -> {
+            Message msg;
+            FileInputStream fis;
+            String sgf_string = null;
+            boolean isReadOK = false;
+            // Send BEGIN message
+            msg = Message.obtain(msg_handler, MSG_LOAD_BEGIN, "msg");
+            msg_handler.sendMessage(msg);
 
-                try {
-                    File file = new File(sgf_path);
-                    if (file.exists() && file.canRead()) {
-                        is = new FileInputStream(file);
-                        String encoding = detectEncoding(new FileInputStream(sgf_path)); //detectEncoding well read file
-                        InputStreamReader reader = new InputStreamReader(is, encoding);
-                        StringBuilder builder = new StringBuilder();
-                        while (reader.ready()) {
-                            builder.append((char) reader.read());
-                        }
-                        reader.close();
-                        is.close();
-                        sgf_string = builder.toString();
+            try {
+                File file = new File(sgf_path);
+                if (file.exists() && file.canRead()) {
+                    fis = new FileInputStream(file);
+                    String encoding = detectEncoding(new FileInputStream(sgf_path)); //detectEncoding will read file
+                    int fileSize = fis.available();
+                    if (fileSize > 0) {
+                        byte[] bytes = new byte[fileSize];
+                        fis.read(bytes);
+                        sgf_string = new String(bytes,encoding);
                         if (!sgf_string.isEmpty()) {
-                            isOK = true;
+                            isReadOK = true;
                         }
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    msg = Message.obtain(msg_handler, MSG_LOAD_FAIL, "msg");
-                    msg_handler.sendMessage(msg);
-                    return;
+                    /*
+                    // It works but very slow when read big file ( >20MB )
+                    InputStreamReader reader = new InputStreamReader(is, encoding);
+                    StringBuilder builder = new StringBuilder();
+                    while (reader.ready()) {
+                        builder.append((char) reader.read());
+                    }
+                    sgf_string = builder.toString();
+                    reader.close();
+                    */
+                    fis.close();
                 }
-                if (isOK) {
-                    game.load_sgf(sgf_string);
-                    msg = Message.obtain(msg_handler, MSG_LOAD_END, "msg");
-                    msg_handler.sendMessage(msg);
-                }
-                else {
-                    msg = Message.obtain(msg_handler, MSG_LOAD_FAIL, "msg");
-                    msg_handler.sendMessage(msg);
-                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                msg = Message.obtain(msg_handler, MSG_LOAD_FAIL, "msg");
+                msg_handler.sendMessage(msg);
+                return;
+            }
+            if (isReadOK) {
+                game.load_sgf(sgf_string);
+                msg = Message.obtain(msg_handler, MSG_LOAD_END, "msg");
+                msg_handler.sendMessage(msg);
+            } else {
+                msg = Message.obtain(msg_handler, MSG_LOAD_FAIL, "msg");
+                msg_handler.sendMessage(msg);
             }
         }).start();
     }

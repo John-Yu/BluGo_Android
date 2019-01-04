@@ -71,7 +71,7 @@ public class ReviewGameActivity extends AppCompatActivity implements GoBoardView
     }
 
     private void load_sgf() {
-        GoActivityUtil.getInstance().load_sgf(this, sgf_path, game, msg_handler);
+        GoActivityUtil.getInstance().load_sgf(sgf_path, game, msg_handler);
     }
 
     private void set_button_enables() {
@@ -110,9 +110,9 @@ public class ReviewGameActivity extends AppCompatActivity implements GoBoardView
                     load_progress.setVisibility(View.VISIBLE); // Show the progressBar
                     break;
                 default:
-                    return false;
+                    break;
             }
-            return true;
+            return false;
         }
     }
 

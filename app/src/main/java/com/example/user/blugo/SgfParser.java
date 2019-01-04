@@ -64,6 +64,7 @@ public class SgfParser {
         ArrayList<ParsedItem> parsed_item = new ArrayList<>();
         ArrayList<ParsedItem> result;
 
+        sgf_string = get_main_branch(sgf_string);
         /* Find pattern ';.*?' */
         Matcher m = semicolon.matcher(sgf_string);
 
@@ -80,8 +81,59 @@ public class SgfParser {
         return parsed_item;
     }
 
+    private String get_main_branch(String sgf_string) {
+        // Drop anything outside "(;...)"
+        final Pattern SGF_PATTERN = Pattern.compile("(?s).*?(\\(\\s*;.*\\)).*?");
+        Matcher sgfMatcher = SGF_PATTERN.matcher(sgf_string);
+        if (sgfMatcher.matches()) {
+            sgf_string = sgfMatcher.group(1);
+        } else {
+            return "";
+        }
+        boolean isMultiGo = false;
+        // MultiGo 's branch: (Main Branch (Main Branch) (Branch) )
+        // Other 's branch: (Main Branch (Branch) Main Branch)
+        if (sgf_string.matches("(?s).*\\)\\s*\\)")) {
+            isMultiGo = true;
+        }
+        int start = 0, end;
+        int subTreeDepth = 0;
+        StringBuilder res = new StringBuilder();
+        // Support unicode characters (UTF-8)
+        for (int i = 0; i < sgf_string.length(); i++) {
+            char c = sgf_string.charAt(i);
+            switch (c) {
+                case '(':
+                    end = i;
+                    if (start < end) {
+                        if (subTreeDepth <= 1 || isMultiGo) {
+                            res.append(sgf_string.substring(start, end));
+                        }
+                        start = end + 1;
+                    }
+                    subTreeDepth += 1;
+                    break;
+                case ')':
+                    end = i;
+                    if (start < end) {
+                        if (subTreeDepth <= 1 || isMultiGo) {
+                            res.append(sgf_string.substring(start, end));
+                        }
+                        start = end + 1;
+                    }
+                    subTreeDepth -= 1;
+                    if (isMultiGo) {
+                        i = sgf_string.length();  // force stop for loop
+                    }
+                    break;
+            }
+        }
+        res.append(")");
+        return res.toString();
+    }
+
     private ParsedItem parse_opt_board_size(String opt) {
-        ParsedItem parsed = null;
+        ParsedItem parsed;
         Integer size;
 
         if (opt == null || opt.length() < 1)
@@ -101,7 +153,7 @@ public class SgfParser {
     }
 
     private ParsedItem parse_opt_handicap(String opt) {
-        ParsedItem parsed = null;
+        ParsedItem parsed;
         Integer value;
 
         if (opt == null || opt.length() < 1)
@@ -214,18 +266,10 @@ public class SgfParser {
             return null;
 
         c = opt.charAt(0);
-        if (c >= 'a' && c <= 'z') {
-            x = (int) c - (int) 'a';
-        } else {
-            x = (int) c - (int) 'A' + 25;
-        }
+        x= get_coor(c);
 
         c = opt.charAt(1);
-        if (c >= 'a' && c <= 'z') {
-            y = (int) c - (int) 'a';
-        } else {
-            y = (int) c - (int) 'A' + 25;
-        }
+        y= get_coor(c);
 
         p = new Point(x, y);
 
@@ -243,7 +287,7 @@ public class SgfParser {
         int x, y;
 
         if (opt == null || opt.length() < 1) {
-            return parsed;
+            return null;
         }
 
         Matcher m = position.matcher(opt);
@@ -252,18 +296,10 @@ public class SgfParser {
             return null;
 
         c = opt.charAt(0);
-        if (c >= 'a' && c <= 'z') {
-            x = (int) c - (int) 'a';
-        } else {
-            x = (int) c - (int) 'A' + 25;
-        }
+        x= get_coor(c);
 
         c = opt.charAt(1);
-        if (c >= 'a' && c <= 'z') {
-            y = (int) c - (int) 'a';
-        } else {
-            y = (int) c - (int) 'A' + 25;
-        }
+        y= get_coor(c);
 
         p = new Point(x, y);
 
@@ -293,18 +329,10 @@ public class SgfParser {
             return null;
 
         c = opt.charAt(0);
-        if (c >= 'a' && c <= 'z') {
-            x = (int) c - (int) 'a';
-        } else {
-            x = (int) c - (int) 'A' + 25;
-        }
+        x= get_coor(c);
 
         c = opt.charAt(1);
-        if (c >= 'a' && c <= 'z') {
-            y = (int) c - (int) 'a';
-        } else {
-            y = (int) c - (int) 'A' + 25;
-        }
+        y= get_coor(c);
 
         p = new Point(x, y);
 
@@ -334,18 +362,10 @@ public class SgfParser {
             return null;
 
         c = opt.charAt(0);
-        if (c >= 'a' && c <= 'z') {
-            x = (int) c - (int) 'a';
-        } else {
-            x = (int) c - (int) 'A' + 25;
-        }
+        x= get_coor(c);
 
         c = opt.charAt(1);
-        if (c >= 'a' && c <= 'z') {
-            y = (int) c - (int) 'a';
-        } else {
-            y = (int) c - (int) 'A' + 25;
-        }
+        y= get_coor(c);
 
         p = new Point(x, y);
 
@@ -368,18 +388,10 @@ public class SgfParser {
             return null;
 
         c = opt.charAt(0);
-        if (c >= 'a' && c <= 'z') {
-            x = (int) c - (int) 'a';
-        } else {
-            x = (int) c - (int) 'A' + 25;
-        }
+        x= get_coor(c);
 
         c = opt.charAt(1);
-        if (c >= 'a' && c <= 'z') {
-            y = (int) c - (int) 'a';
-        } else {
-            y = (int) c - (int) 'A' + 25;
-        }
+        y= get_coor(c);
 
         p = new Point(x, y);
 
@@ -388,6 +400,16 @@ public class SgfParser {
         parsed.content = p;
 
         return parsed;
+    }
+
+    private int get_coor(char c) {
+        int x = 0;
+        if (c >= 'a' && c <= 'z') {
+            x = (int) c - (int) 'a';
+        } else {
+            x = (int) c - (int) 'A' + 25;
+        }
+        return x;
     }
 
     private ParsedItem parse_territory_white(String opt) {
@@ -402,18 +424,10 @@ public class SgfParser {
             return null;
 
         c = opt.charAt(0);
-        if (c >= 'a' && c <= 'z') {
-            x = (int) c - (int) 'a';
-        } else {
-            x = (int) c - (int) 'A' + 25;
-        }
+        x = get_coor(c);
 
         c = opt.charAt(1);
-        if (c >= 'a' && c <= 'z') {
-            y = (int) c - (int) 'a';
-        } else {
-            y = (int) c - (int) 'A' + 25;
-        }
+        y= get_coor(c);
 
         p = new Point(x, y);
 

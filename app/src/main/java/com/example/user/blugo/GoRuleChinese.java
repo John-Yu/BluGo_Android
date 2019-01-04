@@ -3,14 +3,12 @@ package com.example.user.blugo;
 /**
  * Created by user on 2016-06-12.
  */
-public class GoRuleChinese extends  GoRuleJapan{
-    GoRuleChinese(int board_size)
-    {
+public class GoRuleChinese extends GoRuleJapan {
+    GoRuleChinese(int board_size) {
         super(board_size);
     }
 
-    GoRuleChinese(NewBoardState initial_time_line)
-    {
+    GoRuleChinese(NewBoardState initial_time_line) {
         super(initial_time_line);
     }
 

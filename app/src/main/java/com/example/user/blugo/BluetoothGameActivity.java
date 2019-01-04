@@ -5,18 +5,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.media.AudioManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 public class BluetoothGameActivity extends AppCompatActivity implements
-    GoBoardViewListener, GoMessageListener {
+        GoBoardViewListener, GoMessageListener {
     private Handler msg_handler = new Handler(new GoMsgHandler());
     private Handler view_msg_handler = new Handler(new ViewMessageHandler());
 
@@ -43,10 +45,9 @@ public class BluetoothGameActivity extends AppCompatActivity implements
     private int calc_result_confirm = 0x00;
 
 
-
     private String get_info_text() {
         String str, result;
-        GoControl.GoInfo info =  game.get_info();
+        GoControl.GoInfo info = game.get_info();
 
         if (game.calc_mode()) {
             if (info.resigned == GoControl.Player.WHITE) {
@@ -64,19 +65,19 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             }
 
             str = String.format(getString(R.string.white_tr_short) + ": %.1f, " +
-				getString(R.string.black_tr_short) + ": %.1f, %s",
-				info.white_final,
-				info.black_final,
-				result);
+                            getString(R.string.black_tr_short) + ": %.1f, %s",
+                    info.white_final,
+                    info.black_final,
+                    result);
         } else {
             str = String.format("%s(%d), %s: %d, %s: %d",
-				info.turn == GoControl.Player.WHITE?
-				getString(R.string.white_short) : getString(R.string.black_short),
-				info.turn_num,
-				getString(R.string.dead_white_short),
-				info.white_dead,
-				getString(R.string.dead_black_short),
-				info.black_dead);
+                    info.turn == GoControl.Player.WHITE ?
+                            getString(R.string.white_short) : getString(R.string.black_short),
+                    info.turn_num,
+                    getString(R.string.dead_white_short),
+                    info.white_dead,
+                    getString(R.string.dead_black_short),
+                    info.black_dead);
 
             if (info.resigned == GoControl.Player.WHITE) {
                 str += ", " + getString(R.string.black_won_by_resign_short);
@@ -103,9 +104,9 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         Intent intent = getIntent();
         bundle = intent.getExtras();
 
-        GoPlaySetting setting = bundle.getParcelable(GoMessageListener.GAME_SETTING_MESSAGE);
+        GoPlaySetting setting = Objects.requireNonNull(bundle).getParcelable(GoMessageListener.GAME_SETTING_MESSAGE);
 
-        int bw = setting.wb;
+        int bw = Objects.requireNonNull(setting).wb;
         Log.d("TEST", "bw: " + bw);
 
         //game = new GoControlBluetooth(bw == 0? GoControl.Player.BLACK : GoControl.Player.WHITE);
@@ -137,10 +138,10 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         }
 
         game = new GoControlBluetooth(setting.size, setting.komi,
-            setting.handicap, rule,
-            bw == 0? GoControl.Player.BLACK : GoControl.Player.WHITE,
-            setting.handicap > 0? GoControl.Player.WHITE : GoControl.Player.BLACK
-            );
+                setting.handicap, rule,
+                bw == 0 ? GoControl.Player.BLACK : GoControl.Player.WHITE,
+                setting.handicap > 0 ? GoControl.Player.WHITE : GoControl.Player.BLACK
+        );
 
         gv = (GoBoardView) findViewById(R.id.go_board_view);
         gv.setGo_control(game);
@@ -176,8 +177,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             Toast.makeText(this, start_message, Toast.LENGTH_SHORT).show();
     }
 
-    private void stop_server_client()
-    {
+    private void stop_server_client() {
         BlutoothServerThread server;
         BlutoothClientThread client;
 
@@ -188,7 +188,8 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             comm.cancel();
             try {
                 comm.join();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
 
         /* stop server */
@@ -197,7 +198,8 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             server.cancel();
             try {
                 server.join();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
 
         /* stop client */
@@ -206,7 +208,8 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             client.cancel();
             try {
                 client.join();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
     }
 
@@ -217,8 +220,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         gv.release_memory();
     }
 
-    private class GoMsgHandler implements Handler.Callback
-    {
+    private class GoMsgHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
             String tmp;
@@ -240,8 +242,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         }
     }
 
-    private class ViewMessageHandler implements Handler.Callback
-    {
+    private class ViewMessageHandler implements Handler.Callback {
         @Override
         public boolean handleMessage(Message msg) {
             String tmp;
@@ -262,13 +263,11 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         }
     }
 
-    public void pass(View view)
-    {
+    public void pass(View view) {
         game.pass();
     }
 
-    private void handle_comm_message(BlutoothMsgParser.MsgParsed msg)
-    {
+    private void handle_comm_message(BlutoothMsgParser.MsgParsed msg) {
         String m;
         Point p;
         AlertDialog.Builder builder;
@@ -283,17 +282,17 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             case PASS:
                 game.op_pass();
                 Toast.makeText(this, (String) getString(R.string.opponent_passed),
-                    Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
                 break;
 
             case RESIGN:
                 //game.finish();
                 builder = new AlertDialog.Builder(this);
                 builder.setMessage(String.format(getString(R.string.fmt_you_won_by),
-						 game.get_my_color() == GoControl.Player.BLACK?
-						 getString(R.string.black) : getString(R.string.white)))
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.ok, null);
+                        game.get_my_color() == GoControl.Player.BLACK ?
+                                getString(R.string.black) : getString(R.string.white)))
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.ok, null);
                 alert = builder.create();
                 alert.show();
                 game.opponent_resigned();
@@ -303,14 +302,14 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             case RESULT_CONFIRM:
                 calc_result_confirm |= OPPONENT_CONFIRMED;
                 Toast.makeText(this, (String) getString(R.string.opponent_confirmed_result),
-                    Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
                 check_result();
                 break;
 
             case DECLINE_RESULT:
                 calc_result_confirm = 0x00; /* From the beginning */
                 Toast.makeText(this, (String) getString(R.string.opponent_declined_result),
-                    Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
 
                 game.setConfirm_check(false);
                 btn_confirm.setEnabled(true);
@@ -319,12 +318,12 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             case ACCEPT_RESULT:
                 calc_result_confirm |= OPPONENT_ACCEPTED;
                 Toast.makeText(this, (String) getString(R.string.opponent_accepted_result),
-                    Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
 
                 /*try finish game*/
                 if ((calc_result_confirm & BOTH_ACCEPTED) == BOTH_ACCEPTED) {
                     Toast.makeText(this, (String) getString(R.string.game_finished),
-                        Toast.LENGTH_SHORT).show();
+                            Toast.LENGTH_SHORT).show();
                     finish_game();
                 }
                 break;
@@ -338,17 +337,15 @@ public class BluetoothGameActivity extends AppCompatActivity implements
                         break;
 
                     comm.write(BlutoothMsgParser.make_message(
-                        BlutoothMsgParser.MsgType.DECLINE_UNDO, null));
+                            BlutoothMsgParser.MsgType.DECLINE_UNDO, null));
 
                     break;
                 }
                 builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.question_undo_request_accept_it))
-                    /*.setMessage("Opponent requested undo. Would you accept request?")*/
-                    .setCancelable(false)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        /*.setMessage("Opponent requested undo. Would you accept request?")*/
+                        .setCancelable(false)
+                        .setPositiveButton(android.R.string.yes, (dialog, which) -> {
                             BlutoothCommThread comm;
                             comm = BlutoothCommThread.getInstance();
 
@@ -358,12 +355,9 @@ public class BluetoothGameActivity extends AppCompatActivity implements
                             game.undo_apply(true, false);
 
                             comm.write(BlutoothMsgParser.make_message(
-                                BlutoothMsgParser.MsgType.ACCEPT_UNDO, null));
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                                    BlutoothMsgParser.MsgType.ACCEPT_UNDO, null));
+                        })
+                        .setNegativeButton(android.R.string.no, (dialog, which) -> {
                             BlutoothCommThread comm;
                             comm = BlutoothCommThread.getInstance();
 
@@ -371,20 +365,10 @@ public class BluetoothGameActivity extends AppCompatActivity implements
                                 return;
 
                             comm.write(BlutoothMsgParser.make_message(
-                                BlutoothMsgParser.MsgType.DECLINE_UNDO, null));
-                        }
-                    })
-                    .setMultiChoiceItems(new String[]{getString(R.string.refuse_undo_request_permanently)},
-                        null, new DialogInterface.OnMultiChoiceClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which,
-                                                boolean isChecked) {
-                                if (isChecked)
-                                    refuse_undo_permanently = true;
-                                else
-                                    refuse_undo_permanently = false;
-                            }
+                                    BlutoothMsgParser.MsgType.DECLINE_UNDO, null));
                         })
+                        .setMultiChoiceItems(new String[]{getString(R.string.refuse_undo_request_permanently)},
+                                null, (dialog, which, isChecked) -> refuse_undo_permanently = isChecked)
                 ;
                 alert = builder.create();
                 alert.show();
@@ -393,7 +377,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             case DECLINE_UNDO:
                 game.undo_apply(false, true);
                 Toast.makeText(this, (String) getString(R.string.your_undo_request_was_rejected),
-                    Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_SHORT).show();
                 break;
 
             case ACCEPT_UNDO:
@@ -408,20 +392,17 @@ public class BluetoothGameActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Handler get_go_msg_handler()
-    {
+    public Handler get_go_msg_handler() {
         return this.msg_handler;
     }
 
-    public void resign(View view)
-    {
+    public void resign(View view) {
         game.resign();
 
         finish_game();
     }
 
-    public void confirm_result(View view)
-    {
+    public void confirm_result(View view) {
         if (!game.calc_mode())
             return;
 
@@ -434,13 +415,12 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         calc_result_confirm |= YOU_CONFIRMED;
 
         comm.write(BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.RESULT_CONFIRM,
-            null
+                null
         ));
         check_result();
     }
 
-    private void finish_game()
-    {
+    private void finish_game() {
         game.finish_game();
         btn_confirm.setEnabled(false);
         btn_undo.setEnabled(false);
@@ -450,8 +430,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         txt_info.setText(get_info_text());
     }
 
-    private void check_result()
-    {
+    private void check_result() {
         AlertDialog.Builder builder;
 
         if ((calc_result_confirm & BOTH_CONFIRMED) != BOTH_CONFIRMED)
@@ -463,21 +442,21 @@ public class BluetoothGameActivity extends AppCompatActivity implements
         btn_confirm.setEnabled(false);
 
         String message = "";
-        GoControl.GoInfo info =  game.get_info();
+        GoControl.GoInfo info = game.get_info();
         GoRule.RuleID rule = game.get_rule();
 
         message += getString(R.string.rule) + " : " + rule.toString() + "\n";
 
         message += String.format(getString(R.string.dead_white) + " : %d, " +
-				 getString(R.string.dead_black) + " : %d\n",
-				 info.white_dead, info.black_dead);
+                        getString(R.string.dead_black) + " : %d\n",
+                info.white_dead, info.black_dead);
         message += String.format(getString(R.string.white_tr) + " : %d, " +
-				 getString(R.string.black_tr) + " : %d\n",
-				 info.white_score, info.black_score);
+                        getString(R.string.black_tr) + " : %d\n",
+                info.white_score, info.black_score);
         message += String.format(getString(R.string.live_white) + " : %d\n",
-				 info.white_count);
+                info.white_count);
         message += String.format(getString(R.string.live_black) + " : %d\n",
-				 info.black_count);
+                info.black_count);
         message += String.format(getString(R.string.komi) + " : %.1f\n", info.komi);
         message += String.format(getString(R.string.white_total) + " : %.1f\n", info.white_final);
         message += String.format(getString(R.string.black_total) + " : %.1f\n", info.black_final);
@@ -492,11 +471,9 @@ public class BluetoothGameActivity extends AppCompatActivity implements
 
         builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
-            .setTitle(getString(R.string.question_accept_result))
-            .setCancelable(false)
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                .setTitle(getString(R.string.question_accept_result))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     calc_result_confirm |= YOU_ACCEPTED;
                     BlutoothCommThread comm;
                     comm = BlutoothCommThread.getInstance();
@@ -504,44 +481,41 @@ public class BluetoothGameActivity extends AppCompatActivity implements
                     if (comm == null)
                         return;
                     comm.write(BlutoothMsgParser.make_message(
-                        BlutoothMsgParser.MsgType.ACCEPT_RESULT, null));
+                            BlutoothMsgParser.MsgType.ACCEPT_RESULT, null));
 
                     /*try finish game*/
                     if ((calc_result_confirm & BOTH_ACCEPTED) == BOTH_ACCEPTED) {
                         Toast.makeText(BluetoothGameActivity.this, (String) getString(R.string.game_finished),
-                            Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT).show();
                         finish_game();
                     }
-                }
-            })
-            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    calc_result_confirm = 0x00;
-                    BlutoothCommThread comm;
-                    comm = BlutoothCommThread.getInstance();
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        calc_result_confirm = 0x00;
+                        BlutoothCommThread comm;
+                        comm = BlutoothCommThread.getInstance();
 
-                    if (comm == null)
-                        return;
-                    comm.write(BlutoothMsgParser.make_message(
-                        BlutoothMsgParser.MsgType.DECLINE_RESULT, null));
+                        if (comm == null)
+                            return;
+                        comm.write(BlutoothMsgParser.make_message(
+                                BlutoothMsgParser.MsgType.DECLINE_RESULT, null));
 
-                    game.setConfirm_check(false);
-                    btn_confirm.setEnabled(true);
-                }
-            });
+                        game.setConfirm_check(false);
+                        btn_confirm.setEnabled(true);
+                    }
+                });
 
         AlertDialog alert = builder.create();
         alert.show();
     }
 
-    public void undo(View view)
-    {
+    public void undo(View view) {
         game.undo();
     }
 
-    public void save_SGF(View view)
-    {
+    public void save_SGF(View view) {
         GoActivityUtil.getInstance().save_sgf(this, game);
     }
 }

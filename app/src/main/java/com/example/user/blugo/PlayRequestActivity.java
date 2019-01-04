@@ -1,6 +1,7 @@
 package com.example.user.blugo;
 
 import android.Manifest;
+import android.support.annotation.NonNull;
 import android.widget.ProgressBar;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 public class PlayRequestActivity extends AppCompatActivity implements GoMessageListener,
-    Handler.Callback, AdapterView.OnItemSelectedListener {
+        Handler.Callback, AdapterView.OnItemSelectedListener {
     public final static int REQUEST_COARSE_LOCATION = 2;
 
     private ListView dev_listview;
@@ -55,8 +56,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, device_array);
         dev_listview.setAdapter(arrayAdapter);
         dev_listview.setOnItemClickListener(
-            new AdapterView.OnItemClickListener() {
-                public void onItemClick(AdapterView<?> a, View v, int position, long id) {
+                (a, v, position, id) -> {
                     Object o = dev_listview.getItemAtPosition(position);
                     BluetoothDevice device = ((BluetoothDeviceWrap) o).getBluetoothDevice();
 
@@ -68,11 +68,10 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
                             client.join();
                         } catch (InterruptedException e) {
                         }
-                        client = null;
                     }
 
                     client = BlutoothClientThread.getInstance(mBluetoothAdapter, device,
-                        PlayRequestActivity.this);
+                            PlayRequestActivity.this);
                     client.start();
 
                     /* pop-up wait dialog */
@@ -82,7 +81,6 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
                     load_progress.setIndeterminate(true);
                     load_progress.setVisibility(View.VISIBLE);
                 }
-            }
         );
 
         pbar_discover = (ProgressBar) findViewById(R.id.discover_on_progress);
@@ -93,19 +91,19 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
 
         /* rule */
         sp_rule = (Spinner) findViewById(R.id.sp_rule);
-        List<String> rules = new ArrayList<String>();
+        List<String> rules = new ArrayList<>();
         rules.add(getString(R.string.rule_japanese).toUpperCase());
         rules.add(getString(R.string.rule_chinese).toUpperCase());
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, rules);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, rules);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_rule.setAdapter(adapter);
         sp_rule.setOnItemSelectedListener(this);
 
         /* size : 19, 17, 15, 13, 11, 9, 7, 5, 3 */
         sp_board_size = (Spinner) findViewById(R.id.sp_board_size);
-        List<Integer> bd_size = new ArrayList<Integer>();
+        List<Integer> bd_size = new ArrayList<>();
 
-        for (int i = 19 ; i >= 3 ; i -= 2) {
+        for (int i = 19; i >= 3; i -= 2) {
             bd_size.add(i);
         }
 
@@ -128,12 +126,12 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         sp_handicap = (Spinner) findViewById(R.id.sp_handicap);
         List<Integer> handicap = new ArrayList<>();
         handicap.add(0);
-        for (int i = 2 ; i <= 9 ; i++)
+        for (int i = 2; i <= 9; i++)
             handicap.add(i);
         handicap.add(13);
         handicap.add(16);
         handicap.add(25);
-        ArrayAdapter<Integer> handicap_adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, handicap);
+        ArrayAdapter<Integer> handicap_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, handicap);
         bd_size_adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_handicap.setAdapter(handicap_adapter);
         sp_handicap.setOnItemSelectedListener(this);
@@ -143,8 +141,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         reset_default(null);
     }
 
-    public void reset_default(View view)
-    {
+    public void reset_default(View view) {
         sp_rule.setSelection(0, false);
 
         /* default 19x19 */
@@ -159,8 +156,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         komi.setText("6.5");
     }
 
-    private GoPlaySetting get_play_setting()
-    {
+    private GoPlaySetting get_play_setting() {
         GoPlaySetting setting = new GoPlaySetting();
 
         setting.rule = sp_rule.getSelectedItemPosition();
@@ -168,8 +164,8 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
             setting.komi = Float.parseFloat(komi.getText().toString());
         } catch (NumberFormatException e) {
             Log.d("EXP", "'" + komi.getText().toString() + "'" +
-                " cannot be converted to float");
-            setting.komi = (setting.rule == 0)? 6.5f : 7.5f;
+                    " cannot be converted to float");
+            setting.komi = (setting.rule == 0) ? 6.5f : 7.5f;
         }
         setting.size = (Integer) sp_board_size.getSelectedItem();
         setting.wb = sp_wb.getSelectedItemPosition();
@@ -209,13 +205,12 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         }
     }
 
-    public void listBluetoothDevice()
-    {
+    public void listBluetoothDevice() {
         BluetoothDeviceWrap wrap;
 
         device_array.clear();
 
-	/* List already found devices */
+        /* List already found devices */
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 
         if (pairedDevices.size() > 0) {
@@ -233,8 +228,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults)
-    {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_COARSE_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -244,8 +238,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         }
     }
 
-    protected void proceedDiscovery()
-    {
+    protected void proceedDiscovery() {
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
         }
@@ -263,11 +256,10 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         Log.d("TAG", "Result:" + mBluetoothAdapter.startDiscovery());
     }
 
-    public void discover_bluetooth_devices(View view)
-    {
+    public void discover_bluetooth_devices(View view) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_COARSE_LOCATION);
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_COARSE_LOCATION);
         } else
             proceedDiscovery();
     }
@@ -304,7 +296,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
 
                 /* send game request */
                 m = BlutoothMsgParser.make_message(BlutoothMsgParser.MsgType.REQUEST_PLAY,
-                    this.get_play_setting());
+                        this.get_play_setting());
 
                 BlutoothCommThread connected = BlutoothCommThread.getInstance();
                 if (connected != null)
@@ -319,8 +311,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         return false;
     }
 
-    private void handle_comm_message(BlutoothMsgParser.MsgParsed msg)
-    {
+    private void handle_comm_message(BlutoothMsgParser.MsgParsed msg) {
         String m;
         Integer tmp;
         switch (msg.type) {
@@ -333,7 +324,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
 
                 if (tmp < 0) {
                     Toast.makeText(this, (String) "Requested game setting was refused",
-                        Toast.LENGTH_SHORT).show();
+                            Toast.LENGTH_SHORT).show();
                     break;
                 }
 
@@ -385,33 +376,28 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
     private class BluetoothDeviceWrap {
         public BluetoothDevice device;
 
-        public BluetoothDeviceWrap(BluetoothDevice device)
-        {
+        public BluetoothDeviceWrap(BluetoothDevice device) {
             this.device = device;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return String.format("%s (%s)", device.getAddress(), device.getName());
         }
 
         @Override
-        public boolean equals(Object o)
-        {
+        public boolean equals(Object o) {
             BluetoothDeviceWrap target = (BluetoothDeviceWrap) o;
             return device.equals(target.device);
         }
 
-        public BluetoothDevice getBluetoothDevice()
-        {
+        public BluetoothDevice getBluetoothDevice() {
             return this.device;
         }
     }
 
     private class SingleReceiver extends BroadcastReceiver {
-        public void onReceive(Context context, Intent intent)
-        {
+        public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             BluetoothDeviceWrap wrap;
 

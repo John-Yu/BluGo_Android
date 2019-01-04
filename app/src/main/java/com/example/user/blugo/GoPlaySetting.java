@@ -6,15 +6,14 @@ import android.os.Parcelable;
 /**
  * Created by user on 2016-06-09.
  */
-public class GoPlaySetting implements Parcelable{
+public class GoPlaySetting implements Parcelable {
     public int rule = GoRule.RuleID.JAPANESE.getValue(); /* 0:japna, 1:china */
     public float komi = 6.5f;
     public int size = 19;
     public int wb = 0; /* 0: Random, 1: black, 2: white */
     public int handicap = 0; /* 0 ~ 25, only for 19x19 */
 
-    public GoPlaySetting()
-    {
+    public GoPlaySetting() {
     }
 
     @Override
