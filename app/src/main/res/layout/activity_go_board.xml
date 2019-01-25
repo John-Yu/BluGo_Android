@@ -15,66 +15,65 @@
     android:weightSum="1">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="30dp"
-        >
+        android:orientation="vertical">
 
         <TextView
+            android:id="@+id/text_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Turn: white, wd: 20, bd: 30"
-            android:id="@+id/text_info"
-            android:textColor="#ffffff"
             android:layout_gravity="center_horizontal"
-            android:textSize="20dp"/>
+            android:text="Turn: white, wd: 20, bd: 30"
+            android:textColor="#ffffff"
+            android:textSize="20dp" />
     </LinearLayout>
 
     <com.example.user.blugoAI.GoBoardView
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
         android:id="@+id/go_board_view"
-        app:exampleDrawable="@drawable/board"
-        android:layout_weight="1.12"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.12"
+        app:exampleDrawable="@drawable/board" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            >
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <Button
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:text="@string/undo"
                 android:id="@+id/button3"
-                android:onClick="undo"/>
-
-            <Button
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:text="@string/pass"
+                android:onClick="undo"
+                android:text="@string/undo" />
+
+            <Button
                 android:id="@+id/button6"
-                android:onClick="pass"/>
-
-            <Button
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:text="@string/save"
-                android:id="@+id/btn_save"
-                android:onClick="save_SGF"/>
+                android:onClick="pass"
+                android:text="@string/pass" />
 
             <Button
+                android:id="@+id/btn_save"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:onClick="save_SGF"
+                android:text="@string/save" />
+
+            <Button
+                android:id="@+id/btn_resign"
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
-                android:text="@string/resign"
-                android:id="@+id/btn_resign"
-                android:onClick="resign"/>
+                android:onClick="resign"
+                android:text="@string/resign" />
 
         </LinearLayout>
     </RelativeLayout>

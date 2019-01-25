@@ -175,6 +175,8 @@ public class GoBoardView extends View implements GoControl.Callback {
 
             case MotionEvent.ACTION_UP:
                 if (!p.equals(-1, -1)) {
+                    ghost_pos.x = -1;
+                    ghost_pos.y = -1;
                     /* If putStoneAt is successful then this view is updated automatically */
                     go_control.putStoneAt(p.x, p.y, false);
                 }
