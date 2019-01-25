@@ -10,7 +10,7 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    tools:context="com.example.user.blugo.BluetoothGameActivity"
+    tools:context="com.example.user.blugoAI.BluetoothGameActivity"
     android:background="#000000"
     android:weightSum="1"
     tools:ignore="Overdraw">
@@ -32,7 +32,7 @@
             android:textSize="20dp"/>
     </LinearLayout>
 
-    <com.example.user.blugo.GoBoardView
+    <com.example.user.blugoAI.GoBoardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/go_board_view"

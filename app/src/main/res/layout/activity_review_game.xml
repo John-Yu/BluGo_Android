@@ -11,7 +11,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     android:background="#000000"
-    tools:context="com.example.user.blugo.ReviewGameActivity"
+    tools:context="com.example.user.blugoAI.ReviewGameActivity"
     android:weightSum="1">
 
     <LinearLayout
@@ -44,7 +44,7 @@
 
     </LinearLayout>
 
-    <com.example.user.blugo.GoBoardView
+    <com.example.user.blugoAI.GoBoardView
         android:id="@+id/go_board_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
