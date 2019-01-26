@@ -55,6 +55,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
     private Spinner sp_rule;
     private Spinner sp_board_size;
     private Spinner sp_handicap;
+    private Spinner sp_black;
+    private Spinner sp_white;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +126,7 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         View layout = Objects.requireNonNull(inflater).inflate(R.layout.new_single_game, null);
 
         komi = (TextView) layout.findViewById(R.id.num_komi);
-        komi.setText("6.5");
+        komi.setText("7.5");
 
         /* rule */
         sp_rule = (Spinner) layout.findViewById(R.id.sp_rule);
@@ -135,6 +137,19 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_rule.setAdapter(adapter);
         sp_rule.setOnItemSelectedListener(this);
+
+        /* human or AI */
+        sp_black = (Spinner) layout.findViewById(R.id.sp_black);
+        sp_white = (Spinner) layout.findViewById(R.id.sp_white);
+        rules = new ArrayList<>();
+        rules.add(getString(R.string.human).toUpperCase());
+        rules.add(getString(R.string.ai).toUpperCase());
+        ArrayAdapter<String> adapter1 = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, rules);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        sp_black.setAdapter(adapter1);
+        sp_black.setOnItemSelectedListener(this);
+        sp_white.setAdapter(adapter1);
+        sp_white.setOnItemSelectedListener(this);
 
         /* size : 19, 17, 15, 13, 11, 9, 7, 5, 3 */
         sp_board_size = (Spinner) layout.findViewById(R.id.sp_board_size);
@@ -176,6 +191,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                     setting.handicap = (Integer) sp_handicap.getSelectedItem();
                     setting.size = (Integer) sp_board_size.getSelectedItem();
                     setting.rule = sp_rule.getSelectedItemPosition();
+                    setting.black = sp_black.getSelectedItemPosition();
+                    setting.white = sp_white.getSelectedItemPosition();
                     try {
                         setting.komi = Float.parseFloat(komi.getText().toString());
                     } catch (NumberFormatException e) {

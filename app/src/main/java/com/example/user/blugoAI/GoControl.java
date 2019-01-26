@@ -119,7 +119,7 @@ public abstract class GoControl {
 
     public interface Callback {
         void callback_board_state_changed();
-
+        void callback_send_message(int msgID);
         void put_stone_success();
     }
 
@@ -140,7 +140,7 @@ public abstract class GoControl {
 
         public Player resigned = null;
 
-        public float komi = 6.5f;
+        public float komi = 7.5f;
         public int turn_num = 0;
         public Player turn = Player.BLACK;
     }
@@ -164,6 +164,8 @@ public abstract class GoControl {
     public abstract ArrayList<GoRule.BoardPos> get_calc_info();
 
     public abstract Point get_cur_coord();
+
+    public abstract void callAI();
 
     public abstract boolean pass();
 

@@ -35,6 +35,9 @@ public class GoControlSingle extends GoControl {
     private int handicap = 0;
 
     private Object[] determined_result = null;
+    private boolean _black_is_AI = false;
+    private boolean _white_is_AI = false;
+    private int current_turn_num = -1;
 
     GoControlSingle() {
         this(19, Player.BLACK, null, new GoRuleJapan(19), 0);
@@ -61,7 +64,7 @@ public class GoControlSingle extends GoControl {
     GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
                     int start_turn) {
         this(board_size, current_turn, callback_receiver, rule,
-                start_turn, 6.5f, 0);
+                start_turn, 7.5f, 0);
     }
 
     GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
@@ -76,6 +79,7 @@ public class GoControlSingle extends GoControl {
     }
 
     private boolean _isMyTurn() {
+        if(isAI(current_turn)) return false;
         return resigned == null;
     }
 
@@ -498,8 +502,7 @@ public class GoControlSingle extends GoControl {
             rule.get_dead(info);
         }
 
-        ArrayList<GoAction> history = rule.get_action_history();
-        info.turn_num = history.size() + 1 + start_turn;
+        info.turn_num = getTurnNum();
 
         info.resigned = this.resigned;
 
@@ -541,7 +544,6 @@ public class GoControlSingle extends GoControl {
 
     public boolean calc_mode() {
         return pass_count >= MAX_PASS_COUNT;
-
     }
 
     @Override
@@ -570,6 +572,35 @@ public class GoControlSingle extends GoControl {
     @Override
     public Player is_resigned() {
         return resigned;
+    }
+
+    @Override
+    public synchronized void callAI() {
+        if(!isAI(current_turn))
+        {
+            if (callback_receiver != null)
+                callback_receiver.callback_send_message(GoBoardViewListener.MSG_VIEW_ENABLE_BUTTON);
+            return;
+        }
+        int turnNumber = getTurnNum();
+        if (turnNumber == current_turn_num ) return;
+        current_turn_num = turnNumber;
+        if (callback_receiver != null)
+            callback_receiver.callback_send_message(GoBoardViewListener.MSG_VIEW_DISABLE_BUTTON);
+     }
+     private int getTurnNum() {
+         ArrayList<GoAction> history = rule.get_action_history();
+         return  history.size() + 1 + start_turn;
+     }
+    public boolean isAI(Player player)
+    {
+        if(player == Player.BLACK) return _black_is_AI;
+        else return _white_is_AI;
+    }
+    public void setAI(Player player)
+    {
+        if(player == Player.BLACK) _black_is_AI = true;
+        else  _white_is_AI = true;
     }
 
     public int getHandicap() {

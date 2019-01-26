@@ -433,14 +433,7 @@ public class GoBoardView extends View implements GoControl.Callback {
         draw_stone(canvas, 0, x, y, 3, 1, width, height, (int) square);
         draw_stone(canvas, 0, x, y, 3, 3, width, height, (int) square);
         */
-
-        Message msg;
-        GoBoardViewListener parent = (GoBoardViewListener) this.getContext();
-        Handler h;
-
-        h = parent.get_view_msg_handler();
-        msg = Message.obtain(h, GoBoardViewListener.MSG_VIEW_FULLY_DRAWN, "msg");
-        h.sendMessage(msg);
+        send_message_to_parent(GoBoardViewListener.MSG_VIEW_FULLY_DRAWN);
     }
 
     private void draw_stone(Canvas canvas, GoControl.Player stone_color, int i, int j, int alpha) {
@@ -560,9 +553,19 @@ public class GoBoardView extends View implements GoControl.Callback {
         mExampleDrawable = exampleDrawable;
     }
 
+    private void send_message_to_parent(int msgID) {
+        GoBoardViewListener parent = (GoBoardViewListener) this.getContext();
+        Handler h = parent.get_view_msg_handler();
+        Message msg = Message.obtain(h, msgID, "msg");
+        h.sendMessage(msg);
+    }
     @Override
     public void callback_board_state_changed() {
         this.invalidate();
+    }
+    @Override
+    public void callback_send_message(int msgID) {
+        this.send_message_to_parent(msgID);
     }
 
     @Override

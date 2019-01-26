@@ -8,10 +8,12 @@ import android.os.Parcelable;
  */
 public class GoPlaySetting implements Parcelable {
     public int rule = GoRule.RuleID.JAPANESE.getValue(); /* 0:japna, 1:china */
-    public float komi = 6.5f;
+    public float komi = 7.5f;
     public int size = 19;
     public int wb = 0; /* 0: Random, 1: black, 2: white */
     public int handicap = 0; /* 0 ~ 25, only for 19x19 */
+    public int black = 0; /* 0:human, 1:ai */
+    public int white = 0; /* 0:human, 1:ai */
 
     public GoPlaySetting() {
     }
@@ -28,6 +30,8 @@ public class GoPlaySetting implements Parcelable {
         dest.writeInt(size);
         dest.writeInt(wb);
         dest.writeInt(handicap);
+        dest.writeInt(black);
+        dest.writeInt(white);
     }
 
     // this is used to regenerate your object. All Parcelables must have a CREATOR that implements these two methods
@@ -48,5 +52,7 @@ public class GoPlaySetting implements Parcelable {
         size = in.readInt();
         wb = in.readInt();
         handicap = in.readInt();
+        black = in.readInt();
+        white = in.readInt();
     }
 }

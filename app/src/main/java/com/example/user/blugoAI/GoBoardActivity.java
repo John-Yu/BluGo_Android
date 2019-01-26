@@ -25,6 +25,10 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
     private ProgressBar progressBar;
     private String sgf_string = null;
     private File file;
+    private Button btn_save ;
+    private Button btn_undo ;
+    private Button btn_pass ;
+    private Button btn_resign ;
 
     public Handler msg_handler = new Handler(new GoMsgHandler());
     public Handler view_msg_handler = new Handler(new ViewMessageHandler());
@@ -83,6 +87,10 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_go_board);
+        btn_save = (Button) findViewById(R.id.btn_save);
+        btn_undo = (Button) findViewById(R.id.button3);
+        btn_pass = (Button) findViewById(R.id.button6);
+        btn_resign = (Button) findViewById(R.id.btn_resign);
 
         Intent intent = getIntent();
         Bundle bundle;
@@ -117,10 +125,13 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                 rule, start_turn);
                 */
 
-            single_game = new GoControlSingle(Objects.requireNonNull(state).size,
+            GoControlSingle gcs = new GoControlSingle(Objects.requireNonNull(state).size,
                     bw == 0 ? GoControl.Player.BLACK : GoControl.Player.WHITE,
                     setting.komi, setting.handicap, rule, start_turn);
 
+            if(Objects.requireNonNull(setting).black ==1) gcs.setAI(GoControl.Player.BLACK);
+            if(Objects.requireNonNull(setting).white ==1) gcs.setAI(GoControl.Player.WHITE);
+            single_game = gcs;
             /*
                 Because SGF format cannot save initial dead stone information.
                 We lose dead stone information after saving.
@@ -128,7 +139,6 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                 But you don't want to do that. Because we want to try out variation only.
                 */
             boolean enable_save = bundle.getBoolean(ReviewGameActivity.MSG_ENABLE_SAVE);
-            Button btn_save = (Button) findViewById(R.id.btn_save);
             btn_save.setEnabled(enable_save);
         }
 
@@ -251,6 +261,14 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
             switch (msg.what) {
                 case GoBoardViewListener.MSG_VIEW_FULLY_DRAWN:
                     txt_info.setText(get_info_text());
+                    //TODO: here is a good point for check current player is a AI or human
+                    single_game.callAI();
+                    return true;
+                case GoBoardViewListener.MSG_VIEW_ENABLE_BUTTON:
+                    enableButton();
+                    return true;
+                case GoBoardViewListener.MSG_VIEW_DISABLE_BUTTON:
+                    disableButton();
                     return true;
             }
             return false;
@@ -265,5 +283,19 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
     public void resign(View view) {
         single_game.resign();
         txt_info.setText(get_info_text());
+    }
+    private void enableButton()
+    {
+        btn_save.setEnabled(true);
+        btn_undo.setEnabled(true);
+        btn_pass.setEnabled(true);
+        btn_resign.setEnabled(true);
+    }
+    private void disableButton()
+    {
+        btn_save.setEnabled(false);
+        btn_undo.setEnabled(false);
+        btn_pass.setEnabled(false);
+        btn_resign.setEnabled(false);
     }
 }
