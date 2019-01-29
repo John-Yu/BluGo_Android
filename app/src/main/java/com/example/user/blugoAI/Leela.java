@@ -6,7 +6,6 @@ import android.os.Message;
 import android.util.Log;
 
 public class Leela {
-    final String TAG = "com.example.user.blugoAI";
     public boolean isLoad = false;
     private stdoutListen sListener = null;
     private boolean isThinking = false;
@@ -18,13 +17,10 @@ public class Leela {
     }
 
     public Leela(final String weightFile) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                StartEngine(weightFile);
-                isLoad = true;
-            }
+        new Thread(() -> {
+            // TODO Auto-generated method stub
+            StartEngine(weightFile);
+            isLoad = true;
         }).start();
     }
 
@@ -36,7 +32,7 @@ public class Leela {
         sListener.start();
     }
 
-    public void sendCmd(String cmd) {
+    private void sendCmd(String cmd) {
         if (!isLoad) return;
         SendGTP(cmd);
     }
@@ -44,12 +40,15 @@ public class Leela {
     public void clearBoard() {
         sendCmd("clear_board");
     }
+    public void timeSetting(String settings) {
+        sendCmd("time_settings " + settings);
+    }
 
-    public void genMove(String color) {
+    public void genMove(final String color) {
         synchronized (this) {
             isThinking = true;
             sendCmd("genmove " + color);
-            isThinking = false;
+            //isThinking = false;
         }
     }
 
@@ -95,6 +94,7 @@ public class Leela {
         public void run() {
             super.run();
             while (!isInterrupted()) {
+                String TAG = "example.user.blugoAI";
                 try {
                     String sOut = getStdoutFromJNI();
                     if (sOut.isEmpty()) {

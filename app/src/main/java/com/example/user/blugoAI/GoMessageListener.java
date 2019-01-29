@@ -5,7 +5,7 @@ import android.os.Handler;
 /**
  * Created by user on 2016-06-08.
  */
-public interface GoMessageListener {
+interface GoMessageListener {
     int BLUTOOTH_SERVER_SOCKET_ERROR = 2;
     int BLUTOOTH_CLIENT_SOCKET_ERROR = 3;
     int BLUTOOTH_CLIENT_CONNECT_SUCCESS = 4;

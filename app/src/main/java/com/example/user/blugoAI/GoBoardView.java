@@ -37,7 +37,7 @@ public class GoBoardView extends View implements GoControl.Callback {
     private final static String alphabet = "ABCDEFGHJKLMNOPQRST";
     private MediaPlayer mplayer;
 
-    private Point ghost_pos = new Point(-1, -1);
+    private final Point ghost_pos = new Point(-1, -1);
 
     private int board_canvas_x = -1, board_canvas_y = -1;
     private int board_canvas_w = -1, board_canvas_h = -1;
@@ -48,7 +48,6 @@ public class GoBoardView extends View implements GoControl.Callback {
 
     private int ssize = 1;
     private int start_p;
-    private int end_p;
 
     public boolean isView_only_mode() {
         return view_only_mode;
@@ -268,7 +267,7 @@ public class GoBoardView extends View implements GoControl.Callback {
         path = new Path();
 
         start_p = (board_canvas_w - board_square_size * (board_size - 1)) / 2;
-        end_p = start_p + board_square_size * (board_size - 1);
+        int end_p = start_p + board_square_size * (board_size - 1);
 
         for (i = 0; i < board_size; i++) {
             tmp = start_p + board_square_size * i;
@@ -455,7 +454,7 @@ public class GoBoardView extends View implements GoControl.Callback {
         tmpx = board_canvas_x + start_p + board_square_size * i;
         tmpy = board_canvas_y + start_p + board_square_size * j;
 
-        image.setBounds(tmpx - tmpw, tmpy - tmph, tmpx + tmpw, tmpy + tmph);
+        Objects.requireNonNull(image).setBounds(tmpx - tmpw, tmpy - tmph, tmpx + tmpw, tmpy + tmph);
         image.setAlpha(alpha);
         image.draw(canvas);
     }

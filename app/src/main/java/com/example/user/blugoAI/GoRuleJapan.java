@@ -8,8 +8,8 @@ import java.util.Objects;
  * Created by user on 2016-06-02.
  */
 public class GoRuleJapan extends GoRule {
-    protected ArrayList<NewBoardState> new_timeline = new ArrayList<>();
-    private ArrayList<GoControl.GoAction> action_history = new ArrayList<>();
+    final ArrayList<NewBoardState> new_timeline = new ArrayList<>();
+    private final ArrayList<GoControl.GoAction> action_history = new ArrayList<>();
     private int seq_no = 0;
 
     private GoRuleJapan() {

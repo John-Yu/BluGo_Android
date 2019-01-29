@@ -13,17 +13,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NewBoardState implements Parcelable {
     /* May one dimensional array be better ? */
-    public int[] pos;
+    private int[] pos;
     public int size = 19;
     public int ko_x = -1, ko_y = -1;
     public int white_dead = 0, black_dead = 0;
 
-    NewBoardState(boolean clone) {
+    private NewBoardState(boolean clone) {
         if (clone)
             return;
     }
 
-    NewBoardState() {
+    private NewBoardState() {
         this(19);
     }
 
@@ -56,18 +56,18 @@ public class NewBoardState implements Parcelable {
     }
 
     NewBoardState(int size) {
-        this(size, -1, -1);
+        this(size, -1);
     }
 
-    NewBoardState(int size, int ko_x, int ko_y) {
+    private NewBoardState(int size, int ko_x) {
         pos = new int[size * size];
 
         this.size = size;
         this.ko_x = ko_x;
-        this.ko_y = ko_y;
+        this.ko_y = -1;
     }
 
-    boolean isEmpty(int x, int y) {
+    private boolean isEmpty(int x, int y) {
         if (x < 0 || x >= size)
             return false;
 
@@ -85,7 +85,7 @@ public class NewBoardState implements Parcelable {
         return (value >> 8) & 0xFFFF;
     }
 
-    private final GoRule.BoardPosState get_state(int value) {
+    private GoRule.BoardPosState get_state(int value) {
         /* Enumeration's actual value cannot be zero*/
         return GoRule.BoardPosState.valueOf(value & 0xFF);
     }
@@ -167,12 +167,12 @@ public class NewBoardState implements Parcelable {
         gid_u = up_grp_id(x, y, state);
         if ((group_id < 1) || (gid_u >= 1 && gid_u < group_id))
             group_id = gid_u;
-        uc = (gid_u >= 1) ? true : false;
+        uc = gid_u >= 1;
 
         gid_d = down_grp_id(x, y, state);
         if ((group_id < 1) || (gid_d >= 1 && gid_d < group_id))
             group_id = gid_d;
-        dc = (gid_d >= 1) ? true : false;
+        dc = gid_d >= 1;
 
         if (group_id < 1) {
             /* New unlinked single stone */

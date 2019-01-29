@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.Objects;
 
 public class GoBoardActivity extends AppCompatActivity implements FileChooser.FileSelectedListener, GoBoardViewListener {
@@ -23,15 +25,16 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
     private TextView txt_info;
     private GoControl single_game;
     private ProgressBar progressBar;
+    private ProgressBar pbBlack;
+    private ProgressBar pbWhite;
     private String sgf_string = null;
-    private File file;
     private Button btn_save ;
     private Button btn_undo ;
     private Button btn_pass ;
     private Button btn_resign ;
 
-    public Handler msg_handler = new Handler(new GoMsgHandler());
-    public Handler view_msg_handler = new Handler(new ViewMessageHandler());
+    private final Handler msg_handler = new Handler(new GoMsgHandler());
+    private final Handler view_msg_handler = new Handler(new ViewMessageHandler());
 
     private String get_info_text() {
         String str, result;
@@ -66,7 +69,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                             ": %.1f, %s",
                     info.white_final, info.black_final, result);
         } else {
-            str = String.format("%s(%d), %s: %d, %s: %d",
+            str = String.format(Locale.ENGLISH,"%s(%d), %s: %d, %s: %d",
                     info.turn == GoControl.Player.WHITE ?
                             getString(R.string.white_short) : getString(R.string.black_short),
                     info.turn_num,
@@ -91,6 +94,11 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         btn_undo = (Button) findViewById(R.id.button3);
         btn_pass = (Button) findViewById(R.id.button6);
         btn_resign = (Button) findViewById(R.id.btn_resign);
+        pbBlack = (ProgressBar)findViewById(R.id.progressBarBlack);
+        pbWhite = (ProgressBar)findViewById(R.id.progressBarWhite);
+        TextView tvBlack = (TextView) findViewById(R.id.textViewBlack);
+        TextView tvWhite = (TextView) findViewById(R.id.textViewWhite);
+        gv = (GoBoardView) findViewById(R.id.go_board_view);
 
         Intent intent = getIntent();
         Bundle bundle;
@@ -129,8 +137,14 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                     bw == 0 ? GoControl.Player.BLACK : GoControl.Player.WHITE,
                     setting.komi, setting.handicap, rule, start_turn);
 
-            if(Objects.requireNonNull(setting).black ==1) gcs.setAI(GoControl.Player.BLACK);
-            if(Objects.requireNonNull(setting).white ==1) gcs.setAI(GoControl.Player.WHITE);
+            if(Objects.requireNonNull(setting).black ==1) {
+                gcs.setAI(GoControl.Player.BLACK);
+                tvBlack.setText("B: AI");
+            }
+            if(Objects.requireNonNull(setting).white ==1) {
+                gcs.setAI(GoControl.Player.WHITE);
+                tvWhite.setText("W: AI");
+            }
             App mApp = (App)getApplication();
             gcs.leela = mApp.leela;
             gcs.leela.setHandler(view_msg_handler);
@@ -145,7 +159,6 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
             btn_save.setEnabled(enable_save);
         }
 
-        gv = (GoBoardView) findViewById(R.id.go_board_view);
         gv.setGo_control(single_game);
         gv.setFocusable(true);
 
@@ -204,7 +217,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
         progressBar.setIndeterminate(true);
         progressBar.setVisibility(View.VISIBLE);  //To show ProgressBar
 
-        this.file = file;
+        File file1 = file;
 
         Log.d("TEST", "selected file : " + file.toString());
 
@@ -222,7 +235,7 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                 read = is.read(buffer, 0, buffer.length);
 
                 if (read > 0) {
-                    tmp = new String(buffer, 0, read, "UTF-8");
+                    tmp = new String(buffer, 0, read, StandardCharsets.UTF_8);
                     sgf_string += tmp;
                 } else
                     break;
@@ -269,9 +282,15 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                     return true;
                 case GoBoardViewListener.MSG_VIEW_ENABLE_BUTTON:
                     enableButton();
+                    pbBlack.setVisibility(View.INVISIBLE);
+                    pbWhite.setVisibility(View.INVISIBLE);
                     return true;
                 case GoBoardViewListener.MSG_VIEW_DISABLE_BUTTON:
                     disableButton();
+                    if(single_game.getCurrent_turn() == GoControl.Player.BLACK) {
+                        pbBlack.setVisibility(View.VISIBLE);
+                    }
+                    else pbWhite.setVisibility(View.VISIBLE);
                     return true;
                 case GoBoardViewListener.MSG_VIEW_PUT_STONE:
                     String namedCoordinate = (String)msg.obj;

@@ -9,7 +9,7 @@ import java.util.HashSet;
  * Created by user on 2016-06-02.
  */
 public abstract class GoControl {
-    protected Callback callback_receiver = null;
+    Callback callback_receiver = null;
 
     public enum Action {
         PUT, PASS,
@@ -21,12 +21,12 @@ public abstract class GoControl {
 
     public static class GoAction {
         /* who */
-        public Player player;
+        public final Player player;
         /* what */
         public Action action = Action.PUT;
         /* where */
         public Point where = null;
-        public int group_id = 0;
+        int group_id = 0;
 
         public GoAction(int x, int y) {
             this(Player.BLACK, new Point(x, y), Action.PUT);
@@ -44,14 +44,14 @@ public abstract class GoControl {
             this(player, where, action, 0);
         }
 
-        public GoAction(Player player, Point where, Action action, int group_id) {
+        GoAction(Player player, Point where, Action action, int group_id) {
             this.player = player;
             this.where = where;
             this.action = action;
             this.group_id = group_id;
         }
 
-        public String get_sgf_string() {
+        String get_sgf_string() {
             String string = ";";
             switch (player) {
                 case WHITE:
@@ -78,6 +78,7 @@ public abstract class GoControl {
 
         @Override
         protected Object clone() throws CloneNotSupportedException {
+            Object o = super.clone();
             Point p;
             if (where == null)
                 p = null;
@@ -154,7 +155,7 @@ public abstract class GoControl {
     public abstract Player getCurrent_turn();
 
     public abstract boolean putStoneAt(int x, int y, boolean pass);
-    public abstract boolean putStoneAt(String namedCoordinate, boolean pass);
+    public abstract void putStoneAt(String namedCoordinate, boolean pass);
 
     public abstract String get_sgf();
 

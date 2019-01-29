@@ -29,7 +29,7 @@
             android:id="@+id/text_info"
             android:layout_gravity="center_horizontal"
             android:textColor="#ffffff"
-            android:textSize="20dp"/>
+            android:textSize="20sp"/>
     </LinearLayout>
 
     <com.example.user.blugoAI.GoBoardView

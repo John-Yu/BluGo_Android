@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -13,9 +14,9 @@ import java.util.Objects;
 public class GoControlSingle extends GoControl {
     private final static String alphabet = "ABCDEFGHJKLMNOPQRST";
     private int board_size = 19;
-    protected Player current_turn = Player.BLACK;
-    protected GoRule rule;
-    protected float komi = 6.5f;
+    Player current_turn = Player.BLACK;
+    GoRule rule;
+    float komi = 6.5f;
     private int pass_count = 0;
     private static final int MAX_PASS_COUNT = 2;
     private int start_turn = 0;
@@ -31,7 +32,7 @@ public class GoControlSingle extends GoControl {
     0 : white resigned
     1 : black resigned
      */
-    protected Player resigned = null;
+    Player resigned = null;
 
     private int handicap = 0;
 
@@ -66,14 +67,14 @@ public class GoControlSingle extends GoControl {
                 start_turn, komi, handicap);
     }
 
-    GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
-                    int start_turn) {
+    private GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
+                            int start_turn) {
         this(board_size, current_turn, callback_receiver, rule,
                 start_turn, 7.5f, 0);
     }
 
-    GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
-                    int start_turn, float komi, int handicap) {
+    private GoControlSingle(int board_size, Player current_turn, Callback callback_receiver, GoRule rule,
+                            int start_turn, float komi, int handicap) {
         this.board_size = board_size;
         this.current_turn = current_turn;
         this.callback_receiver = callback_receiver;
@@ -109,12 +110,12 @@ public class GoControlSingle extends GoControl {
     }
 
     @Override
-    public synchronized boolean putStoneAt(String namedCoordinate, boolean pass) {
+    public synchronized void putStoneAt(String namedCoordinate, boolean pass) {
         namedCoordinate = namedCoordinate.trim();
         // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
         int x = alphabet.indexOf(namedCoordinate.charAt(0));
         int y = board_size - Integer.parseInt(namedCoordinate.substring(1));
-        return putStoneAt(x,y,pass);
+        putStoneAt(x, y, pass);
     }
 
     @Override
@@ -243,45 +244,45 @@ public class GoControlSingle extends GoControl {
         ArrayList<GoAction> actions = rule.get_action_history();
         int i;
 
-        String sgf_string = "(;GM[1]FF[4]CA[UTF-8]\n";
-        sgf_string += String.format("SZ[%d]HA[%d]KM[%.1f]", board_size, handicap, komi);
-        sgf_string += this.rule.get_rule_id().get_sgf_string();
+        StringBuilder sgf_string = new StringBuilder("(;GM[1]FF[4]CA[UTF-8]\n");
+        sgf_string.append(String.format(Locale.ENGLISH, "SZ[%d]HA[%d]KM[%.1f]", board_size, handicap, komi));
+        sgf_string.append(this.rule.get_rule_id().get_sgf_string());
 
         if (resigned != null) {
-            sgf_string += "RE[";
-            sgf_string += (resigned == Player.BLACK) ? "W+R" : "B+R";
-            sgf_string += "]";
+            sgf_string.append("RE[");
+            sgf_string.append((resigned == Player.BLACK) ? "W+R" : "B+R");
+            sgf_string.append("]");
         } else if (calc_mode()) {
             GoInfo info = get_info();
 
-            sgf_string += "RE[";
+            sgf_string.append("RE[");
 
             if (info.score_diff == 0) {
-                sgf_string += "Draw";
+                sgf_string.append("Draw");
             } else {
-                sgf_string += String.format("%c+%.1f",
+                sgf_string.append(String.format(Locale.ENGLISH, "%c+%.1f",
                         (info.score_diff > 0) ? 'W' : 'B',
-                        Math.abs(info.score_diff));
+                        Math.abs(info.score_diff)));
             }
-            sgf_string += "]";
+            sgf_string.append("]");
         }
 
-        sgf_string += "\n\n";
+        sgf_string.append("\n\n");
 
-        sgf_string += get_sgf_for_added_stones() + "\n\n";
+        sgf_string.append(get_sgf_for_added_stones()).append("\n\n");
 
         for (i = 0; i < actions.size(); i++) {
-            sgf_string += actions.get(i).get_sgf_string() + "\n";
+            sgf_string.append(actions.get(i).get_sgf_string()).append("\n");
         }
 
         if (calc_mode()) {
             String calc_info = get_sgf_from_calc_info();
-            sgf_string += "\n" + calc_info;
+            sgf_string.append("\n").append(calc_info);
         }
 
-        sgf_string += "\n)";
+        sgf_string.append("\n)");
 
-        return sgf_string;
+        return sgf_string.toString();
     }
 
     @Override
@@ -617,12 +618,11 @@ public class GoControlSingle extends GoControl {
             leela.startMonitor();
             isAIInited = true;
         }
-        String color = "w";
-        if(current_turn == Player.BLACK) color = "b";
-        leela.genMove(color);
+        new Thread(() -> leela.genMove(current_turn == Player.BLACK? "b":"w")).start();
      }
      private void InitAI(){
         leela.clearBoard();
+        leela.timeSetting("0 15 1"); //TODO:  15 seconds per move
          HashSet<GoControl.GoAction> stone_pos = getStone_pos();
          for (GoControl.GoAction p : stone_pos) {
              if (p.action != GoControl.Action.PUT || p.where == null)
@@ -648,7 +648,7 @@ public class GoControlSingle extends GoControl {
          ArrayList<GoAction> history = rule.get_action_history();
          return  history.size() + 1 + start_turn;
      }
-    public boolean isAI(Player player)
+    private boolean isAI(Player player)
     {
         if(player == Player.BLACK) return _black_is_AI;
         else return _white_is_AI;

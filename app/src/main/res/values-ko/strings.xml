@@ -120,4 +120,8 @@
         이러한 조건은 대체 재화나 용역의 구입 및 유용성이나 데이터, 이익의 손실, 그리고 영업 방해
         등을 포함하나 이에 국한되지는 않는다.
     </string>
+    <string name="tvBLACK" >BLACK</string>
+    <string name="tvWHITE">WHITE</string>
+    <string name="ai">AI</string>
+    <string name="human">Human</string>
 </resources>

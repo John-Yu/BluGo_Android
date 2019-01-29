@@ -13,9 +13,11 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 public class ReviewGameActivity extends AppCompatActivity implements GoBoardViewListener, SeekBar.OnSeekBarChangeListener {
-    public Handler msg_handler = new Handler(new GoMsgHandler());
-    public Handler view_msg_handler = new Handler(new ViewMessageHandler());
+    private final Handler msg_handler = new Handler(new GoMsgHandler());
+    private final Handler view_msg_handler = new Handler(new ViewMessageHandler());
 
     private final static String PREFIX = "com.example.user.blugoAI.ReviewGameActivity";
     public final static String MSG_BOARD_STATE = PREFIX + ".MSG_BOARD_STATE";
@@ -27,13 +29,13 @@ public class ReviewGameActivity extends AppCompatActivity implements GoBoardView
     private GoBoardView gv;
     private SeekBar sbar;
     private TextView text_pos, text_result;
-    private GoControlReview game = new GoControlReview();
+    private final GoControlReview game = new GoControlReview();
 
     private String sgf_path;
     private boolean need_to_load = false;
     private boolean loading_finished = false;
 
-    private Button button, btn_detail;
+    private Button button;
 
     private ProgressBar load_progress = null;
 
@@ -60,7 +62,7 @@ public class ReviewGameActivity extends AppCompatActivity implements GoBoardView
         loading_finished = false;
 
         button = (Button) findViewById(R.id.btn_variation);
-        btn_detail = (Button) findViewById(R.id.btn_detail);
+        Button btn_detail = (Button) findViewById(R.id.btn_detail);
         load_progress = (ProgressBar) findViewById(R.id.view_progressBar);
     }
 
@@ -93,7 +95,7 @@ public class ReviewGameActivity extends AppCompatActivity implements GoBoardView
 
                     sbar.setMax(game.get_last_pos());
                     sbar.setProgress(game.getCur_pos());
-                    tmp = String.format("%d/%d", game.getCur_pos(), sbar.getMax());
+                    tmp = String.format(Locale.ENGLISH,"%d/%d", game.getCur_pos(), sbar.getMax());
                     text_pos.setText(tmp);
                     loading_finished = true;
 
@@ -147,7 +149,7 @@ public class ReviewGameActivity extends AppCompatActivity implements GoBoardView
         if (!loading_finished)
             return;
 
-        text = String.format("%d/%d", progress, this.sbar.getMax());
+        text = String.format(Locale.ENGLISH,"%d/%d", progress, this.sbar.getMax());
         text_pos.setText(text);
         game.goto_pos(progress);
 

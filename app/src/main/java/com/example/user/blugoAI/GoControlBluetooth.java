@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by user on 2016-06-08.
  */
 public class GoControlBluetooth extends GoControlSingle {
-    private Player my_turn;
+    private final Player my_turn;
     private boolean game_finished = false;
     private boolean confirm_check = false;
     private boolean undo_waiting = false;

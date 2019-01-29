@@ -28,7 +28,7 @@ public class SgfParser {
         UNKNOWN,
     }
 
-    private static String[] ItemType_ID = {
+    private static final String[] ItemType_ID = {
             "SZ",
             "KM",
             "W",

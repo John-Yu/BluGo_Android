@@ -40,18 +40,16 @@ import java.util.Random;
 public class FrontDoorActivity extends AppCompatActivity implements FileChooser.FileSelectedListener,
         Handler.Callback, DialogInterface.OnDismissListener, GoMessageListener,
         AdapterView.OnItemSelectedListener {
-    public Handler msg_handler = new Handler(this);
+    private final Handler msg_handler = new Handler(this);
 
-    public final static int REQUEST_ENABLE_BT = 1;
-    public final static int REQUEST_READ_EXTERNAL_STORAGE = 1;
+    private final static int REQUEST_ENABLE_BT = 1;
+    private final static int REQUEST_READ_EXTERNAL_STORAGE = 1;
 
     public final static String EXTRA_MESSAGE = "com.example.user.blugoAI.FrontDoorActivity.MESSAGE";
 
     private BluetoothAdapter mBluetoothAdapter = null;
 
     private Dialog dialog, dialog_rq_confirm;
-
-    private boolean connection_established = false;
 
     private GoPlaySetting setting;
 
@@ -77,8 +75,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
         dialog_rq_confirm = new Dialog(this,
                 android.R.style.Theme_DeviceDefault_Light_Dialog);
 
-        connection_established = false;
-        copyFile("elf-v1.gz");
+        boolean connection_established = false;
+        copyFile();
         leela = new Leela(weightFilename);
     }
 
@@ -552,14 +550,14 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
-    private void copyFile(final String f) {
+    private void copyFile() {
         InputStream in;
         try {
-            final File of = new File(getDir("leela", MODE_PRIVATE), f);
+            final File of = new File(getDir("leela", MODE_PRIVATE), "elf-v1.gz");
             weightFilename = of.getAbsolutePath();
             if (of.exists()) return;
 
-            String assetFileName = f + ".mp3";
+            String assetFileName = "elf-v1.gz" + ".mp3";
             in = getAssets().open(assetFileName);
             int inSize = in.available();
             if (inSize <= 0) return;

@@ -2,6 +2,7 @@ package com.example.user.blugoAI;
 
 import android.graphics.Point;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,12 +39,12 @@ public class BlutoothMsgParser {
             return (MsgType) MsgType.values()[type];
         }
 
-        public int getValue() {
+        int getValue() {
             return value;
         }
     }
 
-    private static String[] msg_type_string = {
+    private static final String[] msg_type_string = {
             "CHAT",
             "RQ_PLAY",
             "ACK_PLAY",
@@ -79,8 +80,8 @@ public class BlutoothMsgParser {
 
         GoPlaySetting setting = (GoPlaySetting) opt;
 
-        message += String.format("r=%c,", setting.rule == 0 ? 'j' : 'c');
-        message += String.format("komi=%.1f,size=%d,wb=%d,handicap=%d",
+        message += String.format(Locale.ENGLISH,"r=%c,", setting.rule == 0 ? 'j' : 'c');
+        message += String.format(Locale.ENGLISH,"komi=%.1f,size=%d,wb=%d,handicap=%d",
                 setting.komi, setting.size, setting.wb, setting.handicap);
 
         return message;

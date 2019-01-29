@@ -7,7 +7,7 @@ import android.graphics.Point;
  */
 public class GoHandicap {
     private static GoHandicap instance = null;
-    private Point[][] position = new Point[26][];
+    private final Point[][] position = new Point[26][];
 
     private GoHandicap() {
         position[2] = new Point[]{new Point(15, 3), new Point(3, 15)};

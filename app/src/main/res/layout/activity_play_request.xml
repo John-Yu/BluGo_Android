@@ -86,7 +86,7 @@
                     android:ems="10"
                     android:id="@+id/num_komi"
                     android:layout_column="7"
-                    android:autofillHints="" />
+                     />
             </TableRow>
 
             <TableRow

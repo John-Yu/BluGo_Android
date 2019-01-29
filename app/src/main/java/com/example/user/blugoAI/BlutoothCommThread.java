@@ -8,7 +8,7 @@ import android.os.Handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -76,10 +76,7 @@ public class BlutoothCommThread extends Thread {
         while (true) {
             try {
                 bytes = mmInStream.read(buffer);
-                try {
-                    message = new String(buffer, 0, bytes, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                }
+                message = new String(buffer, 0, bytes, StandardCharsets.UTF_8);
 
                 try {
                     mutex.acquire();
@@ -122,10 +119,7 @@ public class BlutoothCommThread extends Thread {
         if (message == null)
             return;
 
-        try {
-            this.write(message.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-        }
+        this.write(message.getBytes(StandardCharsets.UTF_8));
     }
 
     private void write(byte[] bytes) {

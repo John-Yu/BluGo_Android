@@ -1,7 +1,6 @@
 package com.example.user.blugoAI;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.media.AudioManager;
@@ -15,12 +14,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class BluetoothGameActivity extends AppCompatActivity implements
         GoBoardViewListener, GoMessageListener {
-    private Handler msg_handler = new Handler(new GoMsgHandler());
-    private Handler view_msg_handler = new Handler(new ViewMessageHandler());
+    private final Handler msg_handler = new Handler(new GoMsgHandler());
+    private final Handler view_msg_handler = new Handler(new ViewMessageHandler());
 
     private GoBoardView gv;
     private TextView txt_info;
@@ -59,18 +59,18 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             } else if (info.score_diff == 0) {
                 result = getString(R.string.draw).toUpperCase();
             } else if (info.score_diff > 0) {
-                result = String.format(getString(R.string.white_short) + "+%.1f", info.score_diff);
+                result = String.format(Locale.ENGLISH,getString(R.string.white_short) + "+%.1f", info.score_diff);
             } else {
-                result = String.format(getString(R.string.black_short) + "+%.1f", Math.abs(info.score_diff));
+                result = String.format(Locale.ENGLISH,getString(R.string.black_short) + "+%.1f", Math.abs(info.score_diff));
             }
 
-            str = String.format(getString(R.string.white_tr_short) + ": %.1f, " +
+            str = String.format(Locale.ENGLISH,getString(R.string.white_tr_short) + ": %.1f, " +
                             getString(R.string.black_tr_short) + ": %.1f, %s",
                     info.white_final,
                     info.black_final,
                     result);
         } else {
-            str = String.format("%s(%d), %s: %d, %s: %d",
+            str = String.format(Locale.ENGLISH,"%s(%d), %s: %d, %s: %d",
                     info.turn == GoControl.Player.WHITE ?
                             getString(R.string.white_short) : getString(R.string.black_short),
                     info.turn_num,
@@ -188,7 +188,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             comm.cancel();
             try {
                 comm.join();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
 
@@ -198,7 +198,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             server.cancel();
             try {
                 server.join();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
 
@@ -208,7 +208,7 @@ public class BluetoothGameActivity extends AppCompatActivity implements
             client.cancel();
             try {
                 client.join();
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignored) {
             }
         }
     }
@@ -490,21 +490,18 @@ public class BluetoothGameActivity extends AppCompatActivity implements
                         finish_game();
                     }
                 })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        calc_result_confirm = 0x00;
-                        BlutoothCommThread comm;
-                        comm = BlutoothCommThread.getInstance();
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+                    calc_result_confirm = 0x00;
+                    BlutoothCommThread comm;
+                    comm = BlutoothCommThread.getInstance();
 
-                        if (comm == null)
-                            return;
-                        comm.write(BlutoothMsgParser.make_message(
-                                BlutoothMsgParser.MsgType.DECLINE_RESULT, null));
+                    if (comm == null)
+                        return;
+                    comm.write(BlutoothMsgParser.make_message(
+                            BlutoothMsgParser.MsgType.DECLINE_RESULT, null));
 
-                        game.setConfirm_check(false);
-                        btn_confirm.setEnabled(true);
-                    }
+                    game.setConfirm_check(false);
+                    btn_confirm.setEnabled(true);
                 });
 
         AlertDialog alert = builder.create();

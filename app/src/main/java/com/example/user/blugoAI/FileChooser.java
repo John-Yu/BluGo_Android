@@ -15,12 +15,12 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class FileChooser {
+class FileChooser {
     private static final String PARENT_DIR = "..";
 
     private final Activity activity;
-    private ListView list;
-    private Dialog dialog;
+    private final ListView list;
+    private final Dialog dialog;
     private File currentPath;
 
     // filter on file extension
@@ -36,9 +36,8 @@ public class FileChooser {
         void fileSelected(File file);
     }
 
-    public FileChooser setFileListener(FileSelectedListener fileListener) {
+    public void setFileListener(FileSelectedListener fileListener) {
         this.fileListener = fileListener;
-        return this;
     }
 
     private FileSelectedListener fileListener;

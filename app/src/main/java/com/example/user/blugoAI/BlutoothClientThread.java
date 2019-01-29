@@ -16,7 +16,6 @@ public class BlutoothClientThread extends Thread {
     private final BluetoothDevice mmDevice;
     private final BluetoothAdapter mBluetoothAdapter;
     private final GoMessageListener listener;
-    private BlutoothCommThread connected_thread;
 
     private static BlutoothClientThread instance;
 
@@ -71,7 +70,7 @@ public class BlutoothClientThread extends Thread {
         }
 
         //manage connection
-        connected_thread = BlutoothCommThread.getInstance(mmSocket, listener);
+        BlutoothCommThread connected_thread = BlutoothCommThread.getInstance(mmSocket, listener);
         connected_thread.start();
         try {
             msg = Message.obtain(h, GoMessageListener.BLUTOOTH_CLIENT_CONNECT_SUCCESS,
@@ -85,7 +84,7 @@ public class BlutoothClientThread extends Thread {
             h.sendMessage(msg);
         }
         connected_thread = null;
-        this.instance = null;
+        instance = null;
         cancel();
     }
 

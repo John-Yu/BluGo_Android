@@ -31,7 +31,7 @@ import java.util.Set;
 
 public class PlayRequestActivity extends AppCompatActivity implements GoMessageListener,
         Handler.Callback, AdapterView.OnItemSelectedListener {
-    public final static int REQUEST_COARSE_LOCATION = 2;
+    private final static int REQUEST_COARSE_LOCATION = 2;
 
     private ListView dev_listview;
     private ArrayList<BluetoothDeviceWrap> device_array;
@@ -39,7 +39,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
     private ArrayAdapter<BluetoothDeviceWrap> arrayAdapter;
     private SingleReceiver mReceiver = null;
     private ProgressBar pbar_discover;
-    public Handler msg_handler = new Handler(this);
+    private final Handler msg_handler = new Handler(this);
 
     private Spinner sp_rule, sp_board_size, sp_wb, sp_handicap;
     private EditText komi;
@@ -107,7 +107,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
             bd_size.add(i);
         }
 
-        ArrayAdapter<Integer> bd_size_adapter = new ArrayAdapter<Integer>(this, android.R.layout.simple_spinner_item, bd_size);
+        ArrayAdapter<Integer> bd_size_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, bd_size);
         bd_size_adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_board_size.setAdapter(bd_size_adapter);
         sp_board_size.setOnItemSelectedListener(this);
@@ -118,7 +118,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         wb_choose.add(getString(R.string.random));
         wb_choose.add(getString(R.string.black));
         wb_choose.add(getString(R.string.white));
-        ArrayAdapter<String> wb_choose_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, wb_choose);
+        ArrayAdapter<String> wb_choose_adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, wb_choose);
         wb_choose_adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sp_wb.setAdapter(wb_choose_adapter);
 
@@ -138,10 +138,10 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
 
         komi = (EditText) findViewById(R.id.num_komi);
 
-        reset_default(null);
+        reset_default();
     }
 
-    public void reset_default(View view) {
+    public void reset_default() {
         sp_rule.setSelection(0, false);
 
         /* default 19x19 */
@@ -205,7 +205,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         }
     }
 
-    public void listBluetoothDevice() {
+    private void listBluetoothDevice() {
         BluetoothDeviceWrap wrap;
 
         device_array.clear();
@@ -238,7 +238,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
         }
     }
 
-    protected void proceedDiscovery() {
+    private void proceedDiscovery() {
         if (mBluetoothAdapter.isDiscovering()) {
             mBluetoothAdapter.cancelDiscovery();
         }
@@ -373,10 +373,13 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
 
     }
 
-    private class BluetoothDeviceWrap {
-        public BluetoothDevice device;
+    public void reset_default(View view) {
+    }
 
-        public BluetoothDeviceWrap(BluetoothDevice device) {
+    private class BluetoothDeviceWrap {
+        final BluetoothDevice device;
+
+        BluetoothDeviceWrap(BluetoothDevice device) {
             this.device = device;
         }
 
@@ -391,7 +394,7 @@ public class PlayRequestActivity extends AppCompatActivity implements GoMessageL
             return device.equals(target.device);
         }
 
-        public BluetoothDevice getBluetoothDevice() {
+        BluetoothDevice getBluetoothDevice() {
             return this.device;
         }
     }

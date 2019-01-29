@@ -10,6 +10,7 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
+    android:keepScreenOn="true"
     tools:context="com.example.user.blugoAI.GoBoardActivity"
     android:background="#000000"
     android:weightSum="1">
@@ -26,7 +27,54 @@
             android:layout_gravity="center_horizontal"
             android:text="Turn: white, wd: 20, bd: 30"
             android:textColor="#ffffff"
-            android:textSize="20dp" />
+            android:textSize="20sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible">
+
+        <ProgressBar
+            android:id="@+id/progressBarBlack"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:max="100"
+            android:progress="0"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/textViewBlack"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="B: HUMAN"
+            android:textColor="#ffffff"
+            android:textSize="25sp"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/textViewWhite"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="W: HUMAN"
+            android:textColor="#ffffff"
+            android:textSize="25sp"
+            android:gravity="center" />
+
+        <ProgressBar
+            android:id="@+id/progressBarWhite"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:indeterminate="true"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <com.example.user.blugoAI.GoBoardView

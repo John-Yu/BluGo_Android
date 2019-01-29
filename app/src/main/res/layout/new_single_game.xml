@@ -45,7 +45,7 @@
                 android:ems="10"
                 android:id="@+id/num_komi"
                 android:layout_column="7"
-                android:autofillHints="" />
+                 />
         </TableRow>
 
         <TableRow
@@ -90,7 +90,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/textViewB1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="6"
@@ -108,7 +108,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/textViewW1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_column="6"

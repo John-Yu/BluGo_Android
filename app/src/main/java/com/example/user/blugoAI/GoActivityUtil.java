@@ -14,7 +14,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by user on 2016-06-12.
@@ -22,18 +24,18 @@ import java.util.Calendar;
 public class GoActivityUtil implements Handler.Callback, GoMessageListener {
     private static GoActivityUtil instance = null;
 
-    private Handler m_msg_handler = new Handler(this);
+    private final Handler m_msg_handler = new Handler(this);
 
     private class SaveSGF_Msg {
-        public String file_name;
-        public Context context;
-        public GoControl go_control;
+        String file_name;
+        Context context;
+        GoControl go_control;
     }
 
     private GoActivityUtil() {
     }
 
-    public static String detectEncoding(FileInputStream fis) {
+    private static String detectEncoding(FileInputStream fis) {
         String encoding = "UTF-8"; //default encoding
         try {
             byte[] buf = new byte[4096];
@@ -78,7 +80,7 @@ public class GoActivityUtil implements Handler.Callback, GoMessageListener {
         AlertDialog.Builder builder;
         final EditText file_name_input = new EditText(context);
 
-        file_name = String.format(
+        file_name = String.format(Locale.ENGLISH,
                 "%04d%02d%02d_%02d%02d%02d",
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH) + 1,
@@ -147,8 +149,8 @@ public class GoActivityUtil implements Handler.Callback, GoMessageListener {
 
         FileOutputStream os;
         try {
-            os = new FileOutputStream(path + save_sgf_msg.file_name + (true ? ".sgf" : ""));
-            os.write(sgf_text.getBytes("UTF-8"));
+            os = new FileOutputStream(path + save_sgf_msg.file_name + (".sgf"));
+            os.write(sgf_text.getBytes(StandardCharsets.UTF_8));
             os.close();
         } catch (Exception e) {
             e.printStackTrace();
