@@ -8,7 +8,7 @@ import android.content.Context;
  */
 public class App extends Application {
     private static Context appContext;
-
+    public Leela leela;
     @Override
     public void onCreate() {
         super.onCreate();

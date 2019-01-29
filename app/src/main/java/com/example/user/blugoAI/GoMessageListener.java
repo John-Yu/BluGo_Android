@@ -18,6 +18,7 @@ public interface GoMessageListener {
     int MSG_LOAD_END = 11;
     int MSG_LOAD_FAIL = 12;
     int MSG_LOAD_BEGIN = 13;
+    int MSG_AI_NOT_LOAD = 14;
 
     String GAME_SETTING_MESSAGE =
             "com.example.user.blugoAI.GoMessageListener.GAME_SETTING_MESSAGE";

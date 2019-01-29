@@ -154,6 +154,7 @@ public abstract class GoControl {
     public abstract Player getCurrent_turn();
 
     public abstract boolean putStoneAt(int x, int y, boolean pass);
+    public abstract boolean putStoneAt(String namedCoordinate, boolean pass);
 
     public abstract String get_sgf();
 

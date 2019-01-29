@@ -28,6 +28,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -58,6 +62,9 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
     private Spinner sp_black;
     private Spinner sp_white;
 
+    private String weightFilename = "./";
+    private Leela leela;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +78,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                 android.R.style.Theme_DeviceDefault_Light_Dialog);
 
         connection_established = false;
+        copyFile("elf-v1.gz");
+        leela = new Leela(weightFilename);
     }
 
     @Override
@@ -204,9 +213,15 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                     if (setting.handicap > 0 && setting.size < 19) {
                         setting.handicap = 0;
                     }
-
-                    msg = Message.obtain(FrontDoorActivity.this.msg_handler,
-                            SINGLE_GAME_SETTING_FINISHED, setting);
+                    if(setting.black + setting.white > 0 &&  ! leela.isLoad) {
+                         //AI engine is not loaded
+                        msg = Message.obtain(FrontDoorActivity.this.msg_handler,
+                                MSG_AI_NOT_LOAD, setting);
+                    }
+                    else {
+                        msg = Message.obtain(FrontDoorActivity.this.msg_handler,
+                                SINGLE_GAME_SETTING_FINISHED, setting);
+                    }
                     FrontDoorActivity.this.msg_handler.sendMessage(msg);
                 })
                 .setNegativeButton(android.R.string.cancel, null);
@@ -347,6 +362,18 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                 handle_comm_message(parsed);
                 break;
 
+            case GoMessageListener.MSG_AI_NOT_LOAD:
+                //DO NOTHING
+                AlertDialog.Builder builder;
+                builder = new AlertDialog.Builder(this);
+                builder
+                        .setMessage("AI is not loaded, wait a moment.")
+                        .setTitle("Information")
+                        .setNegativeButton(android.R.string.ok, null);
+                AlertDialog alert = builder.create();
+                alert.show();
+                break;
+
             case GoMessageListener.SINGLE_GAME_SETTING_FINISHED:
                 game_setting = (GoPlaySetting) msg.obj;
 
@@ -365,6 +392,8 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
                 bundle.putBoolean(ReviewGameActivity.MSG_ENABLE_SAVE, true);
 
                 intent.putExtras(bundle);
+                App mApp = (App)getApplication();
+                mApp.leela = leela;
 
                 startActivity(intent);
                 break;
@@ -522,5 +551,31 @@ public class FrontDoorActivity extends AppCompatActivity implements FileChooser.
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+    private void copyFile(final String f) {
+        InputStream in;
+        try {
+            final File of = new File(getDir("leela", MODE_PRIVATE), f);
+            weightFilename = of.getAbsolutePath();
+            if (of.exists()) return;
+
+            String assetFileName = f + ".mp3";
+            in = getAssets().open(assetFileName);
+            int inSize = in.available();
+            if (inSize <= 0) return;
+
+            final OutputStream out = new FileOutputStream(of);
+
+            final byte b[] = new byte[65535];
+            int sz = 0;
+            while ((sz = in.read(b)) > 0) {
+                out.write(b, 0, sz);
+            }
+            of.setReadable(true);
+            in.close();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

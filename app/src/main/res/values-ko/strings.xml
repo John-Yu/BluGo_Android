@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BluGo</string>
+    <string name="app_name">BluGoAI</string>
     <string name="about">정보</string>
     <string name="title_activity_review_game">ReviewGameActivity</string>
     <string name="review_game">복기</string>

@@ -11,6 +11,7 @@ import java.util.Objects;
  * Created by user on 2016-06-02.
  */
 public class GoControlSingle extends GoControl {
+    private final static String alphabet = "ABCDEFGHJKLMNOPQRST";
     private int board_size = 19;
     protected Player current_turn = Player.BLACK;
     protected GoRule rule;
@@ -38,6 +39,10 @@ public class GoControlSingle extends GoControl {
     private boolean _black_is_AI = false;
     private boolean _white_is_AI = false;
     private int current_turn_num = -1;
+    private boolean isAIInited = false;
+    private boolean isUndo = false;
+
+    public Leela leela;
 
     GoControlSingle() {
         this(19, Player.BLACK, null, new GoRuleJapan(19), 0);
@@ -104,6 +109,15 @@ public class GoControlSingle extends GoControl {
     }
 
     @Override
+    public synchronized boolean putStoneAt(String namedCoordinate, boolean pass) {
+        namedCoordinate = namedCoordinate.trim();
+        // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
+        int x = alphabet.indexOf(namedCoordinate.charAt(0));
+        int y = board_size - Integer.parseInt(namedCoordinate.substring(1));
+        return putStoneAt(x,y,pass);
+    }
+
+    @Override
     public synchronized boolean putStoneAt(int x, int y, boolean pass) {
         Player next_turn = (current_turn == Player.WHITE) ? Player.BLACK : Player.WHITE;
 
@@ -120,6 +134,12 @@ public class GoControlSingle extends GoControl {
             return false;
 
         pass_count = 0;
+        if(!isAI(current_turn)) {
+            String color = "w";
+            if(current_turn == Player.BLACK) color = "b";
+            leela.playMove(color, convertCoordinatesToName(x,y));
+            isUndo = false;
+        }
 
         current_turn = next_turn;
 
@@ -478,6 +498,8 @@ public class GoControlSingle extends GoControl {
         if (!this.rule.undo()) {
             return false;
         }
+        isUndo = true;
+        leela.undo();
 
         if (last_action.action == Action.PASS && pass_count > 0) {
             pass_count--;
@@ -535,6 +557,7 @@ public class GoControlSingle extends GoControl {
         this.current_turn = Player.BLACK;
         this.rule = null;
         this.rule = new GoRuleJapan(board_size);
+        this.isAIInited = false;
         this.callback_receiver.callback_board_state_changed();
     }
 
@@ -582,12 +605,45 @@ public class GoControlSingle extends GoControl {
                 callback_receiver.callback_send_message(GoBoardViewListener.MSG_VIEW_ENABLE_BUTTON);
             return;
         }
+        if(isUndo) return;
+        if (this.calc_mode()) return;
         int turnNumber = getTurnNum();
         if (turnNumber == current_turn_num ) return;
         current_turn_num = turnNumber;
         if (callback_receiver != null)
             callback_receiver.callback_send_message(GoBoardViewListener.MSG_VIEW_DISABLE_BUTTON);
+        if(!isAIInited){
+            InitAI();
+            leela.startMonitor();
+            isAIInited = true;
+        }
+        String color = "w";
+        if(current_turn == Player.BLACK) color = "b";
+        leela.genMove(color);
      }
+     private void InitAI(){
+        leela.clearBoard();
+         HashSet<GoControl.GoAction> stone_pos = getStone_pos();
+         for (GoControl.GoAction p : stone_pos) {
+             if (p.action != GoControl.Action.PUT || p.where == null)
+                 continue;
+
+             String color = "w";
+             if(p.player == Player.BLACK) color = "b";
+             leela.playMove(color, convertCoordinatesToName( p.where.x, p.where.y));
+         }
+     }
+    /**
+     * Converts a x and y coordinate to a named coordinate eg C16, T5, K10, etc
+     *
+     * @param x x coordinate -- must be valid
+     * @param y y coordinate -- must be valid
+     * @return a string representing the coordinate
+     */
+    private  String convertCoordinatesToName(int x, int y) {
+        // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
+        return alphabet.charAt(x) + "" + (this.board_size - y);
+    }
      private int getTurnNum() {
          ArrayList<GoAction> history = rule.get_action_history();
          return  history.size() + 1 + start_turn;

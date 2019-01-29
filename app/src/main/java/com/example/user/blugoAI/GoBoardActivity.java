@@ -131,6 +131,9 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
 
             if(Objects.requireNonNull(setting).black ==1) gcs.setAI(GoControl.Player.BLACK);
             if(Objects.requireNonNull(setting).white ==1) gcs.setAI(GoControl.Player.WHITE);
+            App mApp = (App)getApplication();
+            gcs.leela = mApp.leela;
+            gcs.leela.setHandler(view_msg_handler);
             single_game = gcs;
             /*
                 Because SGF format cannot save initial dead stone information.
@@ -269,6 +272,10 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
                     return true;
                 case GoBoardViewListener.MSG_VIEW_DISABLE_BUTTON:
                     disableButton();
+                    return true;
+                case GoBoardViewListener.MSG_VIEW_PUT_STONE:
+                    String namedCoordinate = (String)msg.obj;
+                    single_game.putStoneAt(namedCoordinate, false);
                     return true;
             }
             return false;
