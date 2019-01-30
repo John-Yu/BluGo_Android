@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:fullBackupContent="@xml/backup_descriptor"
-        android:extractNativeLibs="false">
+        android:extractNativeLibs="true">
         <activity
             android:name="com.example.user.blugoAI.FrontDoorActivity"
             android:screenOrientation="sensorPortrait"

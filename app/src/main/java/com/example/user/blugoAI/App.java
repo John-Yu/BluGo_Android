@@ -6,7 +6,7 @@ import android.content.Context;
 /**
  * Created by user on 2016-07-06.
  */
-class App extends Application {
+public class App extends Application {
     private static Context appContext;
     public Leela leela;
     @Override
@@ -14,6 +14,7 @@ class App extends Application {
         super.onCreate();
         appContext = this;
     }
+    public App() {}
 
     public static Context getAppContext() {
         return appContext;

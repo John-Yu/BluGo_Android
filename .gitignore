@@ -8,7 +8,7 @@
 .DS_Store
 /build
 /captures
-/.externalNativeBuild
+/app/.externalNativeBuild
 cscope*
 GPATH
 GRTAGS
