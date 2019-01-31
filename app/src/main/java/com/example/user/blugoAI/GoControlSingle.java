@@ -112,10 +112,17 @@ public class GoControlSingle extends GoControl {
     @Override
     public synchronized void putStoneAt(String namedCoordinate, boolean pass) {
         namedCoordinate = namedCoordinate.trim();
-        // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
-        int x = alphabet.indexOf(namedCoordinate.charAt(0));
-        int y = board_size - Integer.parseInt(namedCoordinate.substring(1));
-        putStoneAt(x, y, pass);
+        if(namedCoordinate.equalsIgnoreCase("pass")) {
+            _pass();
+        } else if(namedCoordinate.equalsIgnoreCase("resign")) {
+            this.resigned = current_turn;
+            _pass();
+        } else {
+            // coordinates take the form C16 A19 Q5 K10 etc. I is not used.
+            int x = alphabet.indexOf(namedCoordinate.charAt(0));
+            int y = board_size - Integer.parseInt(namedCoordinate.substring(1));
+            putStoneAt(x, y, pass);
+        }
     }
 
     @Override
@@ -458,7 +465,11 @@ public class GoControlSingle extends GoControl {
         if (!_isMyTurn()) {
             return false;
         }
+        _pass();
+        return true;
+    }
 
+    private  void _pass() {
         Player next_turn = (current_turn == Player.WHITE) ? Player.BLACK : Player.WHITE;
 
         current_turn = next_turn;
@@ -474,7 +485,6 @@ public class GoControlSingle extends GoControl {
         if (callback_receiver != null)
             callback_receiver.callback_board_state_changed();
 
-        return true;
     }
 
     @Override
@@ -500,6 +510,7 @@ public class GoControlSingle extends GoControl {
             return false;
         }
         isUndo = true;
+        current_turn_num = -1;
         leela.undo();
 
         if (last_action.action == Action.PASS && pass_count > 0) {

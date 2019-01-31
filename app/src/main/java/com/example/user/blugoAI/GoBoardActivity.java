@@ -56,14 +56,14 @@ public class GoBoardActivity extends AppCompatActivity implements FileChooser.Fi
             if (info.score_diff == 0) {
                 result = getString(R.string.draw);
             } else if (info.score_diff > 0) {
-                result = String.format(getString(R.string.white_short) + "+%.1f",
+                result = String.format(Locale.ENGLISH,getString(R.string.white_short) + "+%.1f",
                         info.score_diff);
             } else {
-                result = String.format(getString(R.string.black_short) + "+%.1f",
+                result = String.format(Locale.ENGLISH,getString(R.string.black_short) + "+%.1f",
                         Math.abs(info.score_diff));
             }
 
-            str = String.format(getString(R.string.white_tr_short) +
+            str = String.format(Locale.ENGLISH,getString(R.string.white_tr_short) +
                             ": %.1f, " +
                             getString(R.string.black_tr_short) +
                             ": %.1f, %s",
